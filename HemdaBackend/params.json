@@ -1,0 +1,15 @@
+{
+  "system": {
+    "postgresql": {
+        "dbname":"chemda",
+        "user":"postgres",
+        "password":"admin",
+        "host":"localhost",
+        "port":"5432"
+    }
+  },
+  "general": {
+    "port": 8001,
+    "threadSleepTime": 0.1
+  }
+}
