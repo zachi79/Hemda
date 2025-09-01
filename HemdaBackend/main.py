@@ -63,6 +63,6 @@ global mainServer
 mainServer = MainServerClass()
 
 if __name__ == '__main__':
-    print("Start Chemda Server")
+    print("Start Hemda Server")
     with mainServer:
         mainServer.runAll()

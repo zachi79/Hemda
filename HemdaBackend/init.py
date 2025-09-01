@@ -4,7 +4,7 @@ from database import *
 
 class MainInit:
     def __init__(self):
-        self.paramsFile = r"D:\learn\chemdaBackend\params.json"
+        self.paramsFile = r"params.json"
         self.params = self.load_params_from_json(self.paramsFile)
         self.conn = get_db_connection(self.params.system.postgresql)
         pass

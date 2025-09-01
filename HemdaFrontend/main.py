@@ -50,7 +50,6 @@ elif st.session_state.current_page == 'מורים':
     #
     column_names = ['ID', 'שם המורה', 'מספר טלפון', 'מקצוע']
     df = pd.DataFrame(data["teachers_list"], columns=column_names)
-    st.write("### טבלת המורים הנוכחית")
     st.session_state.teachers_df = df
     st.dataframe(st.session_state.teachers_df, use_container_width=True)
 
@@ -173,6 +172,55 @@ elif st.session_state.current_page == 'מערכת שעות קבועה':
     data = {room: [""] * len(times) for room in rooms}
     df = pd.DataFrame(data, index=times)
     st.dataframe(df.style.set_properties(**{"text-align": "center"}), height=500)
+
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+
+    with col1:
+        data = sendRequest("getSchoolsList", None, "get")
+        optionsSchoollName = list(pd.DataFrame(data['schoolsList'])[0])
+        selected_option1 = st.selectbox('בחר בית ספר', optionsSchoollName)
+
+    with col2:
+        options = ['י1', 'י2', 'י3', 'י4','יא1', 'יא2', 'יא3', 'יא4','יב1', 'יב2', 'יב3', 'יב4']
+        selected_option2 = st.selectbox('בחר שכבה וכיתה', options)
+
+    with col3:
+        optionsProf = [ 'כימיה', 'פיסיקה']
+        selected_option3 = st.selectbox('מקצוע', optionsProf)
+
+    with col4:
+        data = sendRequest("getTeacherList", None, "get")
+        teacherNamedb = pd.DataFrame(data['teachers_list'])
+        if selected_option3 == 'כימיה':
+            optionsTeacherName = teacherNamedb[teacherNamedb[3] == 'כימיה']
+            optionsTeacherName = optionsTeacherName[1].tolist()
+        elif selected_option3 == 'פיסיקה':
+            optionsTeacherName = teacherNamedb[teacherNamedb[3] == 'פיסיקה']
+            optionsTeacherName = optionsTeacherName[1].tolist()
+        else:
+            optionsTeacherName = list(teacherNamedb)[1]
+        selected_option4 = st.selectbox('בחר מורה', optionsTeacherName)
+
+    # Place the button in the fifth column
+    with col5:
+        # Add an empty space above the button to align it with the selectboxes
+        st.write("")
+        st.write("")
+        if st.button('הוספה'):
+            st.write('Button clicked!')
+            # You can process the selected options here
+            st.write(
+                f"The selected options are: {selected_option1}, {selected_option2}, {selected_option3}, {selected_option4}")
+
+    with col6:
+        # Add an empty space above the button to align it with the selectboxes
+        st.write("")
+        st.write("")
+        if st.button('מחק'):
+            st.write('Button clicked!')
+            # You can process the selected options here
+            st.write(
+                f"The selected options are: {selected_option1}, {selected_option2}, {selected_option3}, {selected_option4}")
 
 elif st.session_state.current_page == 'מערכת שעות שבועית שותפת':
     st.title('ניהול מערכת בית ספר')

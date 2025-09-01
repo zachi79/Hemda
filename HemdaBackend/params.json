@@ -1,7 +1,7 @@
 {
   "system": {
     "postgresql": {
-        "dbname":"chemda",
+        "dbname":"hemda",
         "user":"postgres",
         "password":"admin",
         "host":"localhost",
