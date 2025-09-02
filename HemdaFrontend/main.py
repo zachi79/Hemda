@@ -173,8 +173,30 @@ elif 'current_page' in st.session_state and st.session_state.current_page == 'מ
         st.session_state.df = pd.DataFrame(data, index=times)
         st.session_state.times = times
 
+    # --- New Column Configuration ---
+    column_config = {}
+    for room in st.session_state.df.columns:
+        column_config[room] = st.column_config.TextColumn(
+            label=room,
+            width="medium"  # You can use "small", "medium", "large", or a pixel value like 150
+        )
+
+    # You can also configure the index (time column) if needed
+    column_config['index'] = st.column_config.TextColumn(
+        label="שעה",
+        width="small"
+    )
+
+    # Display the DataFrame with the new column configuration
+    st.dataframe(
+        st.session_state.df,
+        column_config=column_config,
+        hide_index=False,
+        use_container_width=True
+    )
+
     # Display the DataFrame from session state
-    st.dataframe(st.session_state.df.style.set_properties(**{"text-align": "center"}), height=500)
+    #st.dataframe(st.session_state.df.style.set_properties(**{"text-align": "center"}), height=500)
 
     # All your columns and widgets go here
     col10, col1, col2, col3, col4, col5, col6, col7, col8, col9 = st.columns(10)  # Changed to 8 columns as per previous advice
@@ -245,107 +267,6 @@ elif 'current_page' in st.session_state and st.session_state.current_page == 'מ
             st.session_state.df.loc[st.session_state.times[start_index]:st.session_state.times[end_index],
             room_column] = ""
             st.rerun()
-#
-# elif st.session_state.current_page == 'מערכת שעות קבועה':
-#     # Inject custom CSS for styling the table
-#     st.set_page_config(layout="wide")
-#     st.title('ניהול מערכת בית ספר - מערכת שעות קבועה')
-#     start_time = datetime.strptime("07:30", "%H:%M")
-#     end_time = datetime.strptime("20:00", "%H:%M")
-#     time_interval = timedelta(minutes=15)
-#
-#     # יצירת רשימת השעות
-#     current_time = start_time
-#     times = []
-#     while current_time <= end_time:
-#         times.append(current_time.strftime("%H:%M"))
-#         current_time += time_interval
-#
-#     # יצירת רשימת החדרים
-#     data = sendRequest("getRoomsList", None, "get")
-#     df_rooms = pd.DataFrame(data['roomsList'])
-#     rooms = list(df_rooms[0])
-#     # יצירת DataFrame ריק עם השעות והחדרים
-#     data = {room: [""] * len(times) for room in rooms}
-#     df = pd.DataFrame(data, index=times)
-#     st.dataframe(df.style.set_properties(**{"text-align": "center"}), height=500)
-#     st.session_state.times = times
-#     col1, col2, col3, col4, col5, col6 , col7 , col8, col9 = st.columns(9)
-#
-#     with col1:
-#         data = sendRequest("getSchoolsList", None, "get")
-#         optionsSchoollName = list(pd.DataFrame(data['schoolsList'])[0])
-#         selected_option1 = st.selectbox('בחר בית ספר', optionsSchoollName)
-#
-#     with col2:
-#         options = ['י1', 'י2', 'י3', 'י4','יא1', 'יא2', 'יא3', 'יא4','יב1', 'יב2', 'יב3', 'יב4']
-#         selected_option2 = st.selectbox('בחר שכבה וכיתה', options)
-#
-#     with col3:
-#         optionsProf = [ 'כימיה', 'פיסיקה']
-#         selected_option3 = st.selectbox('מקצוע', optionsProf)
-#
-#     with col4:
-#         # Fetch and process teacher data only once to improve performance
-#         data = sendRequest("getTeacherList", None, "get")
-#         teacherNamedb = pd.DataFrame(data['teachers_list'])
-#
-#         # Determine the list of teachers based on the selected profession
-#         # Using a dictionary lookup is cleaner than multiple if/elif statements
-#         teacher_profs = {
-#             'כימיה': teacherNamedb[teacherNamedb[3] == 'כימיה'],
-#             'פיסיקה': teacherNamedb[teacherNamedb[3] == 'פיסיקה']
-#         }
-#
-#         # Get the teachers for the selected profession. The `.get()` method provides a safe default.
-#         filtered_teachers_df = teacher_profs.get(selected_option3,
-#                                                  pd.DataFrame())  # Using an empty DataFrame as a fallback
-#         optionsTeacherName = filtered_teachers_df[1].tolist()
-#
-#         selected_option4 = st.selectbox('בחר מורה', optionsTeacherName)
-#     with col5:
-#         data = sendRequest("getRoomsList", None, "get")
-#         optionsRooms = list(pd.DataFrame(data['roomsList'])[0])
-#         selected_option5 = st.selectbox('חדר', optionsRooms)
-#
-#     with col6:
-#         selected_option6 = st.selectbox('שעת התחלה', times)
-#
-#     with col7:
-#         selected_option7 = st.selectbox('שעת סיום', times)
-#
-#     # Place the button in the fifth column
-#     with col8:
-#         # Add an empty space above the button to align it with the selectboxes
-#         st.write("")
-#         st.write("")
-#         if st.button('הוספה'):
-#             st.write('Button clicked!')
-#             # Step 2: Get start and end indices
-#             start_index = st.session_state.times.index(selected_option6)
-#             end_index = st.session_state.times.index(selected_option7)
-#
-#             # Step 3: Create the content string
-#             content = f"מורה: {selected_option4}\nכיתה: {selected_option2}"
-#
-#             # Step 4: Update the DataFrame
-#             room_column = selected_option5
-#
-#             # Update the DataFrame using .loc
-#             st.session_state.df.loc[st.session_state.times[start_index]:st.session_state.times[end_index],
-#             room_column] = content
-#
-#             st.experimental_rerun()
-#
-#     with col9:
-#         # Add an empty space above the button to align it with the selectboxes
-#         st.write("")
-#         st.write("")
-#         if st.button('מחק'):
-#             st.write('Button clicked!')
-#             # You can process the selected options here
-#             st.write(
-#                 f"The selected options are: {selected_option1}, {selected_option2}, {selected_option3}, {selected_option4}")
 
 elif st.session_state.current_page == 'מערכת שעות שבועית שותפת':
     st.title('ניהול מערכת בית ספר')
