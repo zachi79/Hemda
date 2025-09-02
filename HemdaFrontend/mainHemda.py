@@ -1,6 +1,11 @@
 # mainHemda.py
 import streamlit as st
 from streamlit_option_menu import option_menu
+import pandas as pd
+
+from sendRequest import sendRequest
+import components
+
 
 # --- Page Configuration and CSS ---
 st.set_page_config(layout="wide")
@@ -59,22 +64,73 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
 # --- Custom Horizontal Menu ---
-selected = option_menu(
-    menu_title=None,
-    options=["ראשי", "רשימת מורים", "רשימת חדרים", "רשימת בתי ספר","מערכת שעות" ,"לוח מבחנים"],
-    icons=["house", "person-fill", "door-open-fill", "building-fill", "table", "table","clock"],
-    menu_icon="cast",
-    default_index=0,
-    orientation="horizontal",
-)
+selected = components.display_main_menu()
 
 # --- Display content based on menu selection ---
 if selected == "ראשי":
     st.title("ראשי")
     st.write("ברוכים הבאים לעמוד הראשי.")
 elif selected == "רשימת מורים":
-    st.switch_page("pages/teachers.py")
+
+    data = sendRequest("getTeacherList", None, "get")
+
+    column_names = ['ID', 'שם המורה', 'מספר טלפון', 'מקצוע']
+    df = pd.DataFrame(data["teachers_list"], columns=column_names)
+    st.session_state.teachers_df = df
+
+    # Use columns to center the dataframe
+    col1, col2, col3 = st.columns([1, 4, 1])
+
+    with col2:
+        st.dataframe(st.session_state.teachers_df, use_container_width=True)
+
+    # --- The rest of your code for forms ---
+    st.write("---")
+    # You can also use columns for the forms to align them
+    col_form1, col_form2, col_form3  = st.columns([1, 4, 1])
+    with col_form2:
+        st.write("### הוספת מורה חדש")
+        with st.form("add_teacher_form"):
+            teacher_name = st.text_input("שם המורה")
+            teacher_phone = st.text_input("מספר טלפון")
+            teacher_subject = st.text_input("מקצוע")
+
+            submitted = st.form_submit_button("הוסף מורה")
+
+            if submitted:
+                if teacher_name and teacher_phone and teacher_subject:
+                    payload = {
+                        'name': teacher_name,
+                        'phone': teacher_phone,
+                        'profession': teacher_subject
+                    }
+                    data = sendRequest("setNewTeacher", payload, "post")
+                    st.success(f"המורה {teacher_name} נוסף בהצלחה!")
+                    st.rerun()
+                else:
+                    st.error("יש למלא את כל השדות כדי להוסיף מורה.")
+
+    # --- מחיקת מורה ---
+    st.write("---")
+    # השתמש בעמודות כדי למרכז את הטופס
+    col_del1, col_del2, col_del3 = st.columns([1, 4, 1])
+
+    with col_del2:
+        st.write("### מחיקת מורה")
+        if not st.session_state.teachers_df.empty:
+            teachers_list = st.session_state.teachers_df['שם המורה'].tolist()
+            teacher_to_delete = st.selectbox("בחר מורה למחיקה", teachers_list)
+
+            if st.button("מחק מורה"):
+                st.session_state.teachers_df = st.session_state.teachers_df[
+                    st.session_state.teachers_df['שם המורה'] != teacher_to_delete]
+                st.success(f"המורה {teacher_to_delete} נמחק בהצלחה!")
+                st.rerun()
+        else:
+            st.write("אין מורים למחיקה.")
+    pass
 elif selected == "רשימת חדרים":
     st.switch_page("pages/rooms.py")
 elif selected == "רשימת בתי ספר":
