@@ -183,7 +183,14 @@ elif selected == "מערכת שעות":
 
     # Display content based on sub-menu selection
     if sub_selected == "קבועה":
-        st.write("### הוספת שיעור למערכת שעות קבועה")
+
+        # יצירת שלוש עמודות
+        # [1, 2, 1] - יוצר עמודה שמאלית צרה, עמודה מרכזית רחבה, ועמודה ימנית צרה.
+        col1, col2, col3 = st.columns([1, 2, 1])
+
+        # הצבת הכותרת בעמודה האמצעית
+        with col2:
+            st.markdown("<h3 style='text-align: center;'>עריכת מערכת שעות קבועה</h3>", unsafe_allow_html=True)
 
         # Fetch data for dropdowns
         schools_data = sendRequest("getSchoolsList", None, "get")
@@ -275,7 +282,7 @@ elif selected == "מערכת שעות":
         df_schedule = pd.DataFrame(data)
 
         # Display the DataFrame as a table in Streamlit
-        st.dataframe(df_schedule, use_container_width=True, index=False)
+        st.dataframe(df_schedule, use_container_width=True,hide_index=True)
 
     elif sub_selected == "שוטפת":
         st.write("כאן תוצג מערכת שעות שוטפת.")
