@@ -132,9 +132,44 @@ elif selected == "רשימת מורים":
             st.write("אין מורים למחיקה.")
     pass
 elif selected == "רשימת חדרים":
-    st.switch_page("pages/rooms.py")
+
+    col_form1, col_form2, col_form3  = st.columns([1, 4, 1])
+    with col_form2:
+
+        data = sendRequest("getRoomsList", None, "get")
+        df_rooms = pd.DataFrame(data['roomsList'])
+        df_rooms.columns = ['מספר חדר', 'יעוד']
+        st.dataframe(df_rooms, use_container_width=True)
 elif selected == "רשימת בתי ספר":
-    st.switch_page("pages/schools.py")
+    col_form1, col_form2, col_form3  = st.columns([1, 4, 1])
+    with col_form2:
+        data = sendRequest("getSchoolsList", None, "get")
+        df_school = pd.DataFrame(data['schoolsList'])
+        df_school.columns = ['שם בית ספר', 'מספר טלפון', 'כתובת']
+        st.dataframe(df_school, use_container_width=True)
+        st.write("---")
+        st.write("### הוספת בית ספר")
+    col_form1, col_form2, col_form3 = st.columns([1, 4, 1])
+    with col_form2:
+        with st.form("add_teacher_form"):
+            teacher_name = st.text_input("שם בית ספר")
+            teacher_phone = st.text_input("מספר טלפון")
+            teacher_subject = st.text_input("כתובת")
+            submitted = st.form_submit_button("הוסף בית ספר")
+
+            if submitted:
+                # בדיקה שכל השדות הוזנו
+                if teacher_name and teacher_phone and teacher_subject:
+                    new_teacher = pd.DataFrame([{
+                        'שם בית ספר': teacher_name,
+                        'מספר טלפון': teacher_phone,
+                        'כתובת': teacher_subject
+                    }])
+                    st.session_state.teachers_df = pd.concat([st.session_state.teachers_df, new_teacher], ignore_index=True)
+                    st.success(f"בית ספר {teacher_name} נוסף בהצלחה!")
+                    st.rerun()
+                else:
+                    st.error("יש למלא את כל השדות כדי להוסיף בית ספר.")
 elif selected == "מערכת שעות":
     # Nested horizontal menu for the "מערכת שעות" page
     sub_selected = option_menu(
@@ -148,7 +183,100 @@ elif selected == "מערכת שעות":
 
     # Display content based on sub-menu selection
     if sub_selected == "קבועה":
-        st.write("כאן תוצג מערכת שעות קבועה.")
+        st.write("### הוספת שיעור למערכת שעות קבועה")
+
+        # Fetch data for dropdowns
+        schools_data = sendRequest("getSchoolsList", None, "get")
+        school_names = [school[0] for school in schools_data['schoolsList']]
+
+        rooms_data = sendRequest("getRoomsList", None, "get")
+        room_numbers = [room[0] for room in rooms_data['roomsList']]
+
+        teachers_data = sendRequest("getTeacherList", None, "get")
+        teacher_names = [teacher[1] for teacher in teachers_data['teachers_list']]
+
+        # Define grades and subjects
+        grades = [f'י{i + 1}' for i in range(3)] + [f'יא{i + 1}' for i in range(3)] + [f'יב{i + 1}' for i in range(3)]
+        subjects = ['כימיה', 'פיסיקה']  # Example subjects
+
+        # Define days of the week in Hebrew
+        days_of_week = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי"]
+
+        # Generate time options from 07:15 to 20:00, in 15-minute increments
+        start_time_options = pd.date_range("07:15", "20:00", freq="15min").strftime("%H:%M").tolist()
+
+        # Use columns to align form inputs
+        col_form1, col_form2, col_form3 = st.columns([1,20,1])
+
+        with col_form2:
+            with st.form("add_fixed_lesson_form"):
+                col1, col2, col3, col4, col5, col6, col7, col8, col9, col10 = st.columns(10)
+                with col1:
+                    school_selection = st.selectbox("בחר בית ספר:", school_names, key="list1")
+
+                with col2:
+                    grade_selection = st.selectbox("חר שכבה", grades, key="list2")
+
+                with col3:
+                    room_selection = st.selectbox("בחר חדר:", room_numbers, key="list3")
+
+                with col4:
+                    subject_selection = st.selectbox("בחר מקצוע:", subjects, key="list4")
+
+                with col5:
+                    teacher_selection = st.selectbox("בחר מורה:", teacher_names, key="list5")
+
+                with col6:
+                    day_selection = st.selectbox("בחר יום בשבוע:", days_of_week, key="list6")
+
+                with col7:
+                    start_time = st.selectbox("בחר שעת התחלה:", start_time_options, key="list7")
+
+                with col8:
+                    start_time_index = start_time_options.index(start_time)
+                    end_time_options = start_time_options[start_time_index + 1:]  # End time must be after start time
+                    start_time = st.selectbox("בחר שעת סיום:", start_time_options, key="list8")
+
+                with col9:
+                    submitted = st.form_submit_button("הוסף שיעור")
+
+                with col10:
+                    deleteSub = st.form_submit_button("מחק שיעור")
+
+                if submitted:
+                    # You would add your logic here to save the new lesson
+                    # For example, sending a request to your backend:
+                    # payload = {
+                    #     "school": school_selection,
+                    #     "grade": grade_selection,
+                    #     "room": room_selection,
+                    #     "subject": subject_selection,
+                    #     "teacher": teacher_selection,
+                    #     "day": day_selection, # Add the new day field
+                    #     "start_time": start_time,
+                    #     "end_time": end_time
+                    # }
+                    # sendRequest("setNewLesson", payload, "post")
+
+                    st.success(
+                        f"שיעור חדש נוסף בהצלחה: {subject_selection} עם {teacher_selection} בבית ספר {school_selection}, שכבה {grade_selection}, חדר {room_selection} ביום {day_selection} בין השעות {start_time} ל-{end_time}.")
+                    st.rerun()
+
+
+        time_intervals = pd.date_range("07:30", "20:00", freq="15min").strftime("%H:%M").tolist()
+
+        data = {
+            "שעה": time_intervals
+        }
+
+        for room in room_numbers:
+            data[room] = [""] * len(time_intervals)
+
+        df_schedule = pd.DataFrame(data)
+
+        # Display the DataFrame as a table in Streamlit
+        st.dataframe(df_schedule, use_container_width=True, index=False)
+
     elif sub_selected == "שוטפת":
         st.write("כאן תוצג מערכת שעות שוטפת.")
     elif sub_selected == "עבור מורה":
