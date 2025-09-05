@@ -76,15 +76,25 @@ elif selected == "רשימת מורים":
 
     data = sendRequest("getTeacherList", None, "get")
 
-    column_names = ['ID', 'שם המורה', 'מספר טלפון', 'מקצוע']
+    column_names = ['ID', 'שם המורה', 'מספר טלפון', 'מקצוע', 'צבע']
     df = pd.DataFrame(data["teachers_list"], columns=column_names)
     st.session_state.teachers_df = df
+
+
+    # --- Styling the DataFrame ---
+    # A function that takes a single cell value and returns a CSS style string
+    def color_cell(val):
+        return f'background-color: {val}'
+
+    # Apply the style to the 'צבע' column
+    styled_df = st.session_state.teachers_df.style.applymap(color_cell, subset=['צבע'])
 
     # Use columns to center the dataframe
     col1, col2, col3 = st.columns([1, 4, 1])
 
     with col2:
-        st.dataframe(st.session_state.teachers_df, use_container_width=True)
+        # Display the styled DataFrame
+        st.dataframe(styled_df, use_container_width=True)
 
     # --- The rest of your code for forms ---
     st.write("---")
@@ -96,7 +106,7 @@ elif selected == "רשימת מורים":
             teacher_name = st.text_input("שם המורה")
             teacher_phone = st.text_input("מספר טלפון")
             teacher_subject = st.text_input("מקצוע")
-
+            teacher_color = st.color_picker("בחר צבע למורה", "#FF4B4B")
             submitted = st.form_submit_button("הוסף מורה")
 
             if submitted:
@@ -104,7 +114,8 @@ elif selected == "רשימת מורים":
                     payload = {
                         'name': teacher_name,
                         'phone': teacher_phone,
-                        'profession': teacher_subject
+                        'profession': teacher_subject,
+                        'color': teacher_color
                     }
                     data = sendRequest("setNewTeacher", payload, "post")
                     st.success(f"המורה {teacher_name} נוסף בהצלחה!")
