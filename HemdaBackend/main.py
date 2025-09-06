@@ -13,6 +13,7 @@ class MainServerClass(MainInit):
         self.teacherListDB = None
         self.schoolsListDB = None
         self.roomsListDB = None
+        self.fixedTimeTableDB = None
 
     def __enter__(self):
         return self
@@ -57,6 +58,22 @@ class MainServerClass(MainInit):
         if self.roomsListDB == None:
             self.roomsListDB = getRoomsListFromDB(self.conn)
         return self.roomsListDB
+
+
+    def getFixedTimeTable(self):
+        if self.fixedTimeTableDB == None:
+            self.fixedTimeTableDB = getFixedTimeTableDB(self.conn)
+        return self.fixedTimeTableDB
+
+    def setFixedTimeTable(self, data):
+
+        self.fixedTimeTableDB = setFixedTimeTableDB(self.conn, data)
+        return self.fixedTimeTableDB
+
+    def delFixedTimeTable(self, data):
+
+        self.fixedTimeTableDB = delFixedTimeTableDB(self.conn, data)
+        return self.fixedTimeTableDB
 
 # Create a global instance of the server.
 global mainServer

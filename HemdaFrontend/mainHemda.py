@@ -201,7 +201,9 @@ elif selected == "מערכת שעות":
 
         # הצבת הכותרת בעמודה האמצעית
         with col2:
-            st.markdown("<h3 style='text-align: center;'>עריכת מערכת שעות קבועה</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align: center;'> מערכת שעות קבועה</h3>", unsafe_allow_html=True)
+
+        years = [f'{year}-{year+1}' for year in range(2025, 2040)]
 
         # Fetch data for dropdowns
         schools_data = sendRequest("getSchoolsList", None, "get")
@@ -228,12 +230,15 @@ elif selected == "מערכת שעות":
 
         with col_form2:
             with st.form("add_fixed_lesson_form"):
-                col1, col2, col3, col4, col5, col6, col7, col8, col9, col10 = st.columns(10)
+                col11, col1, col2, col3, col4, col5, col6, col7, col8, col9, col10   = st.columns(11)
+                with col11:
+                    year_selection = st.selectbox("בחר שנה:", years, key="list11")
+
                 with col1:
                     school_selection = st.selectbox("בחר בית ספר:", school_names, key="list1")
 
                 with col2:
-                    grade_selection = st.selectbox("חר שכבה", grades, key="list2")
+                    grade_selection = st.selectbox("בחר שכבה", grades, key="list2")
 
                 with col3:
                     room_selection = st.selectbox("בחר חדר:", room_numbers, key="list3")
@@ -253,7 +258,7 @@ elif selected == "מערכת שעות":
                 with col8:
                     start_time_index = start_time_options.index(start_time)
                     end_time_options = start_time_options[start_time_index + 1:]  # End time must be after start time
-                    start_time = st.selectbox("בחר שעת סיום:", start_time_options, key="list8")
+                    end_time = st.selectbox("בחר שעת סיום:", start_time_options, key="list8")
 
                 with col9:
                     submitted = st.form_submit_button("הוסף שיעור")
@@ -262,24 +267,25 @@ elif selected == "מערכת שעות":
                     deleteSub = st.form_submit_button("מחק שיעור")
 
                 if submitted:
-                    # You would add your logic here to save the new lesson
-                    # For example, sending a request to your backend:
-                    # payload = {
-                    #     "school": school_selection,
-                    #     "grade": grade_selection,
-                    #     "room": room_selection,
-                    #     "subject": subject_selection,
-                    #     "teacher": teacher_selection,
-                    #     "day": day_selection, # Add the new day field
-                    #     "start_time": start_time,
-                    #     "end_time": end_time
-                    # }
-                    # sendRequest("setNewLesson", payload, "post")
+
+                    payload = {
+                        "year": year_selection,
+                        "school": school_selection,
+                        "grade": grade_selection,
+                        "room": room_selection,
+                        "subject": subject_selection,
+                        "teacher": teacher_selection,
+                        "day": day_selection, # Add the new day field
+                        "start_time": start_time,
+                        "end_time": end_time
+                    }
+                    sendRequest("setFixedTimeTable", payload, "post")
 
                     st.success(
                         f"שיעור חדש נוסף בהצלחה: {subject_selection} עם {teacher_selection} בבית ספר {school_selection}, שכבה {grade_selection}, חדר {room_selection} ביום {day_selection} בין השעות {start_time} ל-{end_time}.")
                     st.rerun()
 
+        fixedTimeTable = sendRequest("getFixedTimeTable", None, "post")
 
         time_intervals = pd.date_range("07:30", "20:00", freq="15min").strftime("%H:%M").tolist()
 
