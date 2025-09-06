@@ -67,12 +67,12 @@ class MainServerClass(MainInit):
 
     def setFixedTimeTable(self, data):
 
-        self.fixedTimeTableDB = setFixedTimeTableDB(self.conn, data)
+        #self.fixedTimeTableDB = setFixedTimeTableDB(self.conn, data)
         return self.fixedTimeTableDB
 
     def delFixedTimeTable(self, data):
 
-        self.fixedTimeTableDB = delFixedTimeTableDB(self.conn, data)
+        #self.fixedTimeTableDB = delFixedTimeTableDB(self.conn, data)
         return self.fixedTimeTableDB
 
 # Create a global instance of the server.

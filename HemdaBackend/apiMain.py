@@ -78,14 +78,41 @@ def getFixedTimeTable():
     payload = json.dumps(payload)
     return payload
 
+class TimeTableData(BaseModel):
+
+    day_of_week: str
+    start_time: str
+    end_time: str
+    yearSelect: str
+    teacher_name: str
+    profession: str
+    schoolName: str
+    schoolClass: str
+    room_number: str
+
+
 @app.post("/setFixedTimeTable")
-def setFixedTimeTable(data):
+def setFixedTimeTable(data: TimeTableData):
     payloadToQ = {
         "cmd": "setNewTimeTable",
         "data": data
     }
     my_queue.put(payloadToQ)
-    fixedTimeTable = mainServer.setFixedTimeTable()
+    fixedTimeTable = mainServer.setFixedTimeTable(data)
+    payload = {
+        "fixedTimeTable": fixedTimeTable
+    }
+    payload = json.dumps(payload)
+    return payload
+
+@app.post("/delFixedTimeTable")
+def delFixedTimeTable(data):
+    payloadToQ = {
+        "cmd": "delNewTimeTable",
+        "data": data
+    }
+    my_queue.put(payloadToQ)
+    fixedTimeTable = mainServer.delFixedTimeTable()
     payload = {
         "fixedTimeTable": fixedTimeTable
     }

@@ -19,6 +19,13 @@ def queueThread(conn, params):
             if item["cmd"] == "setNewTeacher":
                 query.setNewTeacher(conn, item["data"])
                 pass
+            if item["cmd"] == "setFixedTimeTable":
+                query.setFixedTimeTableDB(conn, item["data"])
+                pass
+            if item["cmd"] == "delFixedTimeTable":
+                query.delFixedTimeTableDB(conn, item["data"])
+                pass
+
             shared_data.my_queue.task_done()
 
             pass

@@ -269,16 +269,17 @@ elif selected == "מערכת שעות":
                 if submitted:
 
                     payload = {
-                        "year": year_selection,
-                        "school": school_selection,
-                        "grade": grade_selection,
-                        "room": room_selection,
-                        "subject": subject_selection,
-                        "teacher": teacher_selection,
-                        "day": day_selection, # Add the new day field
+                        "yearSelect": year_selection,
+                        "schoolName": school_selection,
+                        "schoolClass": grade_selection,
+                        "room_number": room_selection,
+                        "profession": subject_selection,
+                        "teacher_name": teacher_selection,
+                        "day_of_week": day_selection, # Add the new day field
                         "start_time": start_time,
                         "end_time": end_time
                     }
+
                     sendRequest("setFixedTimeTable", payload, "post")
 
                     st.success(
