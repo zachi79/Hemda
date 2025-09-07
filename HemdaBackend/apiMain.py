@@ -79,7 +79,6 @@ def getFixedTimeTable():
     return payload
 
 class TimeTableData(BaseModel):
-
     day_of_week: str
     start_time: str
     end_time: str
@@ -93,8 +92,9 @@ class TimeTableData(BaseModel):
 
 @app.post("/setFixedTimeTable")
 def setFixedTimeTable(data: TimeTableData):
+    print("setFixedTimeTable")
     payloadToQ = {
-        "cmd": "setNewTimeTable",
+        "cmd": "setFixedTimeTable",
         "data": data
     }
     my_queue.put(payloadToQ)
@@ -108,7 +108,7 @@ def setFixedTimeTable(data: TimeTableData):
 @app.post("/delFixedTimeTable")
 def delFixedTimeTable(data):
     payloadToQ = {
-        "cmd": "delNewTimeTable",
+        "cmd": "delFixedTimeTable",
         "data": data
     }
     my_queue.put(payloadToQ)

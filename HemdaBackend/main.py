@@ -66,8 +66,18 @@ class MainServerClass(MainInit):
         return self.fixedTimeTableDB
 
     def setFixedTimeTable(self, data):
-
-        #self.fixedTimeTableDB = setFixedTimeTableDB(self.conn, data)
+        data_to_insert = (
+            data.day_of_week,
+            data.start_time,
+            data.end_time,
+            data.yearSelect,
+            data.teacher_name,
+            data.profession,
+            data.schoolName,
+            data.schoolClass,
+            data.room_number
+        )
+        self.teacherListDB.append(data_to_insert)
         return self.fixedTimeTableDB
 
     def delFixedTimeTable(self, data):

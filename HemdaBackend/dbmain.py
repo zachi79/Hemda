@@ -13,9 +13,8 @@ def sendGetData(conn, query):
         cur.close()
     return data
 
-def sendSetNewTeacherData(conn, query, data):
+def sendSetData(conn, query, data):
     cursor = conn.cursor()
-    data = (data.name, data.phone, data.profession)
     cursor.execute(query, data)
     conn.commit()
     cursor.close()
