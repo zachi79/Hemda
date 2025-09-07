@@ -266,6 +266,24 @@ elif selected == "מערכת שעות":
                 with col10:
                     deleteSub = st.form_submit_button("מחק שיעור")
 
+                if deleteSub:
+                    payload = {
+                        "yearSelect": year_selection,
+                        "schoolName": school_selection,
+                        "schoolClass": grade_selection,
+                        "room_number": room_selection,
+                        "profession": subject_selection,
+                        "teacher_name": teacher_selection,
+                        "day_of_week": day_selection,  # Add the new day field
+                        "start_time": start_time,
+                        "end_time": end_time
+                    }
+
+                    sendRequest("delFixedTimeTable", payload, "post")
+
+                    st.success(
+                        f"שיעור נמחק בהצלחה: {subject_selection} עם {teacher_selection} בבית ספר {school_selection}, שכבה {grade_selection}, חדר {room_selection} ביום {day_selection} בין השעות {start_time} ל-{end_time}.")
+                    st.rerun()
                 if submitted:
 
                     payload = {

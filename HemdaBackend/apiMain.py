@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -72,8 +73,14 @@ def getFixedTimeTable():
     fixedTimeTable = mainServer.getFixedTimeTable()
     if fixedTimeTable == None:
         fixedTimeTable = []
+
+    converted_list = [
+        tuple(item.strftime('%H:%M:%S') if isinstance(item, datetime.time) else item for item in sublist)
+        for sublist in fixedTimeTable
+    ]
+
     payload = {
-        "fixedTimeTable": fixedTimeTable
+        "fixedTimeTable": converted_list
     }
     payload = json.dumps(payload)
     return payload

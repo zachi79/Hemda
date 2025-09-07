@@ -23,7 +23,7 @@ def getRoomsListFromDB(conn):
     return data
 
 def getFixedTimeTableDB(conn):
-    query = "SELECT * FROM public.fixed_timetable ORDER BY user_id ASC"
+    query = "SELECT * FROM public.fixed_timetable ORDER BY id ASC "
     data = sendGetData(conn, query)
     return data
 
@@ -52,6 +52,30 @@ def setFixedTimeTableDB(conn, data):
     return data
 
 def delFixedTimeTableDB(conn, data):
-    query = "DELETE FROM fixed_timetable WHERE day_of_week = %s"
-    data = sendSetData(conn, query, data)
+    data_to_del = (
+        data.day_of_week,
+        data.start_time,
+        data.end_time,
+        data.yearSelect,
+        data.teacher_name,
+        data.profession,
+        data.schoolName,
+        data.schoolClass,
+        data.room_number
+    )
+
+    query = """
+        DELETE FROM public.fixed_timetable
+        WHERE
+            day_of_week = %s AND
+            start_time = %s AND
+            end_time = %s AND
+            yearSelect = %s AND
+            teacher_name = %s AND
+            profession = %s AND
+            schoolName = %s AND
+            schoolClass = %s AND
+            room_number = %s;
+        """
+    data = sendSetData(conn, query, data_to_del)
     return data
