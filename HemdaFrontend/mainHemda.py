@@ -305,20 +305,54 @@ elif selected == "מערכת שעות":
                     st.rerun()
 
         fixedTimeTable = sendRequest("getFixedTimeTable", None, "post")
+        columns = ['ID', 'Day', 'Start_Time', 'End_Time', 'Year', 'Teacher', 'Prof', 'School', 'Class', 'Room']
+        # Create the DataFrame
+        fixedTimeTableDF = pd.DataFrame(fixedTimeTable['fixedTimeTable'])
+        # Assign column names
+        fixedTimeTableDF.columns = columns[:len(fixedTimeTableDF.columns)]
+        fixedTimeTableDFSSelected = fixedTimeTableDF[fixedTimeTableDF['Day'] == day_selection]
 
         time_intervals = pd.date_range("07:30", "20:00", freq="15min").strftime("%H:%M").tolist()
-
         data = {
             "שעה": time_intervals
         }
-
         for room in room_numbers:
             data[room] = [""] * len(time_intervals)
-
         df_schedule = pd.DataFrame(data)
+        for _, row in fixedTimeTableDFSSelected.iterrows():
+            room = row['Room']
 
+            # Check if the room exists in the schedule columns
+            if room in df_schedule.columns:
+                start_time = pd.to_datetime(row['Start_Time']).strftime('%H:%M')
+                end_time = pd.to_datetime(row['End_Time']).strftime('%H:%M')
+
+                # Generate the time intervals for the current class
+                class_time_intervals = pd.date_range(start_time, end_time, freq='15min', inclusive='left').strftime(
+                    '%H:%M').tolist()
+
+                # Create a string with the class details
+                class_info = f"{row['Prof']}<br>{row['Teacher']}<br>{row['School']}<br>{row['Class']}"
+
+                # Update the schedule DataFrame for each time interval
+                for time_slot in class_time_intervals:
+                    df_schedule.loc[df_schedule['שעה'] == time_slot, room] = class_info
         # Display the DataFrame as a table in Streamlit
-        st.dataframe(df_schedule, use_container_width=True,hide_index=True)
+        # --- Styling Logic ---
+        def color_cells_with_text(val):
+            """
+            Applies a blue background to cells that are not empty.
+            """
+            # Check if the cell value is not an empty string
+            if val != "":
+                return 'background-color: blue;'
+            return ''
+
+
+        # Apply the styling function using .style.map()
+        styled_df = df_schedule.style.map(color_cells_with_text, subset=df_schedule.columns.difference(['שעה']))
+
+        st.markdown(styled_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
     elif sub_selected == "שוטפת":
         st.write("כאן תוצג מערכת שעות שוטפת.")
