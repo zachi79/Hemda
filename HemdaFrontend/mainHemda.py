@@ -1,4 +1,5 @@
 # mainHemda.py
+import pandas
 import streamlit as st
 from streamlit_option_menu import option_menu
 import pandas as pd
@@ -213,7 +214,9 @@ elif selected == "מערכת שעות":
         room_numbers = [room[0] for room in rooms_data['roomsList']]
 
         teachers_data = sendRequest("getTeacherList", None, "get")
-        teacher_names = [teacher[1] for teacher in teachers_data['teachers_list']]
+        columns = ['id','teachername','phone','prof','color']
+        teachers_dataDF = pandas.DataFrame(teachers_data['teachers_list'],columns=columns)
+
 
         # Define grades and subjects
         grades = [f'י{i + 1}' for i in range(3)] + [f'יא{i + 1}' for i in range(3)] + [f'יב{i + 1}' for i in range(3)]
@@ -223,7 +226,7 @@ elif selected == "מערכת שעות":
         days_of_week = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי"]
 
         # Generate time options from 07:15 to 20:00, in 15-minute increments
-        start_time_options = pd.date_range("07:15", "20:00", freq="15min").strftime("%H:%M").tolist()
+        start_time_options = pd.date_range("07:30", "20:00", freq="15min").strftime("%H:%M").tolist()
 
         # Use columns to align form inputs
         col_form1, col_form2, col_form3 = st.columns([1,20,1])
@@ -247,6 +250,8 @@ elif selected == "מערכת שעות":
                     subject_selection = st.selectbox("בחר מקצוע:", subjects, key="list4")
 
                 with col5:
+                    teachers_by_prof = teachers_dataDF[teachers_dataDF['prof'] == 'כימיה']
+                    teacher_names = teachers_by_prof['teachername'].tolist()
                     teacher_selection = st.selectbox("בחר מורה:", teacher_names, key="list5")
 
                 with col6:
@@ -258,7 +263,7 @@ elif selected == "מערכת שעות":
                 with col8:
                     start_time_index = start_time_options.index(start_time)
                     end_time_options = start_time_options[start_time_index + 1:]  # End time must be after start time
-                    end_time = st.selectbox("בחר שעת סיום:", start_time_options, key="list8")
+                    end_time = st.selectbox("בחר שעת סיום:", end_time_options, key="list8")
 
                 with col9:
                     submitted = st.form_submit_button("הוסף שיעור")
@@ -309,8 +314,9 @@ elif selected == "מערכת שעות":
         # Create the DataFrame
         fixedTimeTableDF = pd.DataFrame(fixedTimeTable['fixedTimeTable'])
         # Assign column names
-        fixedTimeTableDF.columns = columns[:len(fixedTimeTableDF.columns)]
-        fixedTimeTableDFSSelected = fixedTimeTableDF[fixedTimeTableDF['Day'] == day_selection]
+        if len(fixedTimeTableDF) > 0:
+            fixedTimeTableDF.columns = columns[:len(fixedTimeTableDF.columns)]
+            fixedTimeTableDFSSelected = fixedTimeTableDF[fixedTimeTableDF['Day'] == day_selection]
 
         time_intervals = pd.date_range("07:30", "20:00", freq="15min").strftime("%H:%M").tolist()
         data = {
@@ -319,24 +325,25 @@ elif selected == "מערכת שעות":
         for room in room_numbers:
             data[room] = [""] * len(time_intervals)
         df_schedule = pd.DataFrame(data)
-        for _, row in fixedTimeTableDFSSelected.iterrows():
-            room = row['Room']
+        if len(fixedTimeTableDF) > 0:
+            for _, row in fixedTimeTableDFSSelected.iterrows():
+                room = row['Room']
 
-            # Check if the room exists in the schedule columns
-            if room in df_schedule.columns:
-                start_time = pd.to_datetime(row['Start_Time']).strftime('%H:%M')
-                end_time = pd.to_datetime(row['End_Time']).strftime('%H:%M')
+                # Check if the room exists in the schedule columns
+                if room in df_schedule.columns:
+                    start_time = pd.to_datetime(row['Start_Time']).strftime('%H:%M')
+                    end_time = pd.to_datetime(row['End_Time']).strftime('%H:%M')
 
-                # Generate the time intervals for the current class
-                class_time_intervals = pd.date_range(start_time, end_time, freq='15min', inclusive='left').strftime(
-                    '%H:%M').tolist()
+                    # Generate the time intervals for the current class
+                    class_time_intervals = pd.date_range(start_time, end_time, freq='15min', inclusive='left').strftime(
+                        '%H:%M').tolist()
 
-                # Create a string with the class details
-                class_info = f"{row['Prof']}<br>{row['Teacher']}<br>{row['School']}<br>{row['Class']}"
+                    # Create a string with the class details
+                    class_info = f"{row['Prof']}<br>{row['Teacher']}<br>{row['School']}<br>{row['Class']}"
 
-                # Update the schedule DataFrame for each time interval
-                for time_slot in class_time_intervals:
-                    df_schedule.loc[df_schedule['שעה'] == time_slot, room] = class_info
+                    # Update the schedule DataFrame for each time interval
+                    for time_slot in class_time_intervals:
+                        df_schedule.loc[df_schedule['שעה'] == time_slot, room] = class_info
         # Display the DataFrame as a table in Streamlit
         # --- Styling Logic ---
         def color_cells_with_text(val):
@@ -345,7 +352,9 @@ elif selected == "מערכת שעות":
             """
             # Check if the cell value is not an empty string
             if val != "":
-                return 'background-color: blue;'
+                teacher_name = val.split('<br>')[1]
+                color = teachers_dataDF.loc[teachers_dataDF['teachername'] == teacher_name, 'color'].iloc[0]
+                return f'background-color: {color};'
             return ''
 
 
