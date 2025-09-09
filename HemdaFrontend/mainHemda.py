@@ -228,14 +228,18 @@ elif selected == "מערכת שעות":
         # Generate time options from 07:15 to 20:00, in 15-minute increments
         start_time_options = pd.date_range("07:30", "20:00", freq="15min").strftime("%H:%M").tolist()
 
+        yearSelectedCol, daySelectedCol = st.columns(2)
+        with yearSelectedCol:
+            year_selection = st.selectbox("בחר שנה:", years, key="list11")
+        with daySelectedCol:
+            day_selection = st.selectbox("בחר יום בשבוע:", days_of_week, key="list6")
         # Use columns to align form inputs
         col_form1, col_form2, col_form3 = st.columns([1,20,1])
 
         with col_form2:
             with st.form("add_fixed_lesson_form"):
-                col11, col1, col2, col3, col4, col5, col6, col7, col8, col9, col10   = st.columns(11)
-                with col11:
-                    year_selection = st.selectbox("בחר שנה:", years, key="list11")
+                col1, col2, col3, col4, col5, col7, col8, col9, col10   = st.columns(9)
+
 
                 with col1:
                     school_selection = st.selectbox("בחר בית ספר:", school_names, key="list1")
@@ -253,9 +257,6 @@ elif selected == "מערכת שעות":
                     teachers_by_prof = teachers_dataDF[teachers_dataDF['prof'] == 'כימיה']
                     teacher_names = teachers_by_prof['teachername'].tolist()
                     teacher_selection = st.selectbox("בחר מורה:", teacher_names, key="list5")
-
-                with col6:
-                    day_selection = st.selectbox("בחר יום בשבוע:", days_of_week, key="list6")
 
                 with col7:
                     start_time = st.selectbox("בחר שעת התחלה:", start_time_options, key="list7")
