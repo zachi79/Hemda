@@ -200,10 +200,6 @@ elif selected == "מערכת שעות":
         # [1, 2, 1] - יוצר עמודה שמאלית צרה, עמודה מרכזית רחבה, ועמודה ימנית צרה.
         col1, col2, col3 = st.columns([1, 2, 1])
 
-        # הצבת הכותרת בעמודה האמצעית
-        with col2:
-            st.markdown("<h3 style='text-align: center;'> מערכת שעות קבועה</h3>", unsafe_allow_html=True)
-
         years = [f'{year}-{year+1}' for year in range(2025, 2040)]
 
         # Fetch data for dropdowns
@@ -227,12 +223,13 @@ elif selected == "מערכת שעות":
 
         # Generate time options from 07:15 to 20:00, in 15-minute increments
         start_time_options = pd.date_range("07:30", "20:00", freq="15min").strftime("%H:%M").tolist()
-
-        yearSelectedCol, daySelectedCol = st.columns(2)
-        with yearSelectedCol:
-            year_selection = st.selectbox("בחר שנה:", years, key="list11")
-        with daySelectedCol:
-            day_selection = st.selectbox("בחר יום בשבוע:", days_of_week, key="list6")
+        col_formUp1, col_formUp2, col_formUp3 = st.columns([2, 1,2])
+        with col_formUp2:
+            yearSelectedCol, daySelectedCol = st.columns(2)
+            with yearSelectedCol:
+                year_selection = st.selectbox("בחר שנה:", years, key="list11")
+            with daySelectedCol:
+                day_selection = st.selectbox("בחר יום בשבוע:", days_of_week, key="list6")
         # Use columns to align form inputs
         col_form1, col_form2, col_form3 = st.columns([1,20,1])
 
