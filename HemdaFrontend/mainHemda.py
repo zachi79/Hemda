@@ -308,7 +308,7 @@ elif selected == "מערכת שעות":
                     st.rerun()
 
         fixedTimeTable = sendRequest("getFixedTimeTable", None, "post")
-        columns = ['ID', 'Day', 'Start_Time', 'End_Time', 'Year', 'Teacher', 'Prof', 'School', 'Class', 'Room']
+        columns = ['Day', 'Start_Time', 'End_Time', 'Year', 'Teacher', 'Prof', 'School', 'Class', 'Room']
         # Create the DataFrame
         fixedTimeTableDF = pd.DataFrame(fixedTimeTable['fixedTimeTable'])
         # Assign column names

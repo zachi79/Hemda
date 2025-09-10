@@ -119,7 +119,7 @@ def delFixedTimeTable(data: TimeTableData):
         "data": data
     }
     my_queue.put(payloadToQ)
-    fixedTimeTable = mainServer.delFixedTimeTable()
+    fixedTimeTable = mainServer.delFixedTimeTable(data)
     payload = {
         "fixedTimeTable": fixedTimeTable
     }

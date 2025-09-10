@@ -13,7 +13,7 @@ class MainServerClass(MainInit):
         self.teacherListDB = None
         self.schoolsListDB = None
         self.roomsListDB = None
-        self.fixedTimeTableDB = None
+        self.fixedTimeTableDB = []
 
     def __enter__(self):
         return self
@@ -66,9 +66,7 @@ class MainServerClass(MainInit):
         return self.fixedTimeTableDB
 
     def setFixedTimeTable(self, data):
-        idTemp = 0
         data_to_insert = (
-            idTemp,
             data.day_of_week,
             data.start_time,
             data.end_time,
@@ -83,18 +81,19 @@ class MainServerClass(MainInit):
         return self.fixedTimeTableDB
 
     def delFixedTimeTable(self, data):
-        data_to_remove = (
-            data.day_of_week,
-            data.start_time,
-            data.end_time,
-            data.yearSelect,
-            data.teacher_name,
-            data.profession,
-            data.schoolName,
-            data.schoolClass,
-            data.room_number
-        )
-        self.fixedTimeTableDB.remove(data_to_remove)
+        if self.fixedTimeTableDB != []:
+            data_to_remove = (
+                data.day_of_week,
+                data.start_time,
+                data.end_time,
+                data.yearSelect,
+                data.teacher_name,
+                data.profession,
+                data.schoolName,
+                data.schoolClass,
+                data.room_number
+            )
+            self.fixedTimeTableDB.remove(data_to_remove)
         return self.fixedTimeTableDB
 
 # Create a global instance of the server.
