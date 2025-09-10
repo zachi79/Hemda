@@ -115,21 +115,19 @@ CREATE TABLE IF NOT EXISTS timeTable (
 
 
 CREATE TABLE fixed_timetable (
-    id SERIAL PRIMARY KEY,
     day_of_week VARCHAR(15) NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
-	yearSelect VARCHAR(50) NOT NULL,
+    yearSelect VARCHAR(50) NOT NULL,
     teacher_name VARCHAR(50) NOT NULL,
     profession VARCHAR(50) NOT NULL,
-	schoolName VARCHAR(255) NOT NULL,
-	schoolClass VARCHAR(255) NOT NULL,
-    room_number VARCHAR(10) NOT NULL	
+    schoolName VARCHAR(255) NOT NULL,
+    schoolClass VARCHAR(255) NOT NULL,
+    room_number VARCHAR(10) NOT NULL
 );
 
 
 CREATE TABLE dynamic_timetable (
-    id SERIAL PRIMARY KEY,
     day_of_week VARCHAR(15) NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
