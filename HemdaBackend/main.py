@@ -66,7 +66,9 @@ class MainServerClass(MainInit):
         return self.fixedTimeTableDB
 
     def setFixedTimeTable(self, data):
+        idTemp = 0
         data_to_insert = (
+            idTemp,
             data.day_of_week,
             data.start_time,
             data.end_time,

@@ -113,7 +113,7 @@ def setFixedTimeTable(data: TimeTableData):
     return payload
 
 @app.post("/delFixedTimeTable")
-def delFixedTimeTable(data):
+def delFixedTimeTable(data: TimeTableData):
     payloadToQ = {
         "cmd": "delFixedTimeTable",
         "data": data

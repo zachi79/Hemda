@@ -271,15 +271,15 @@ elif selected == "מערכת שעות":
 
                 if deleteSub:
                     payload = {
-                        "yearSelect": year_selection,
-                        "schoolName": school_selection,
-                        "schoolClass": grade_selection,
-                        "room_number": room_selection,
-                        "profession": subject_selection,
-                        "teacher_name": teacher_selection,
                         "day_of_week": day_selection,  # Add the new day field
                         "start_time": start_time,
-                        "end_time": end_time
+                        "end_time": end_time,
+                        "yearSelect": year_selection,
+                        "teacher_name": teacher_selection,
+                        "profession": subject_selection,
+                        "schoolName": school_selection,
+                        "schoolClass": grade_selection,
+                        "room_number": room_selection
                     }
 
                     sendRequest("delFixedTimeTable", payload, "post")
