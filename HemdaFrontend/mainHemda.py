@@ -196,8 +196,6 @@ elif selected == "מערכת שעות":
     # Display content based on sub-menu selection
     if sub_selected == "קבועה":
 
-        # יצירת שלוש עמודות
-        # [1, 2, 1] - יוצר עמודה שמאלית צרה, עמודה מרכזית רחבה, ועמודה ימנית צרה.
         col1, col2, col3 = st.columns([1, 2, 1])
 
         years = [f'{year}-{year+1}' for year in range(2025, 2040)]
