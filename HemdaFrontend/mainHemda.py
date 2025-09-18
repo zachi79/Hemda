@@ -5,6 +5,11 @@ from streamlit_option_menu import option_menu
 import pandas as pd
 import calendar
 from datetime import date
+
+import rooms
+import schools
+import teacherList
+import testsBoard
 from sendRequest import sendRequest
 import components
 
@@ -70,177 +75,19 @@ st.markdown("""
 # --- Custom Horizontal Menu ---
 selected = components.display_main_menu()
 
-
-def display_calendar_month(year, month):
-    """
-    Displays a calendar grid for a given month and year in Streamlit.
-    """
-    # Use Hebrew day names in the correct order (Sunday to Saturday)
-    hebrew_day_names = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"]
-
-    st.markdown(f"## {calendar.month_name[month]} {year}")
-
-    # Create columns for the day names
-    cols = st.columns(7)
-    for i, day in enumerate(hebrew_day_names):
-        with cols[i]:
-            st.markdown(f"**{day}**", unsafe_allow_html=True)
-
-    # Iterate through the weeks of the month
-    for week in calendar.Calendar().monthdatescalendar(year, month):
-        # Create columns for each week
-        cols = st.columns(7)
-        for i, day_date in enumerate(week):
-            with cols[i]:
-                # The square size and style
-                container_style = """
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                padding: 10px;
-                margin: 2px;
-                text-align: center;
-                height: 120px;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                """
-
-                day_content = ""
-                # Check if the day is in the current month
-                if day_date.month == month:
-                    day_content += f"**{day_date.day}**"
-                    if day_date in st.session_state.notes:
-                        note_text = st.session_state.notes[day_date]
-                        day_content += f"""
-                        <div style="overflow-y: auto; max-height: 70px; font-size: 12px; text-align: right; margin-top: 5px;">
-                            {note_text}
-                        </div>
-                        """
-                    st.markdown(
-                        f'<div style="{container_style}">{day_content}</div>',
-                        unsafe_allow_html=True
-                    )
-                else:
-                    # For days from the previous/next month, display an empty or faded square
-                    st.markdown(
-                        f'<div style="{container_style} border: none;"></div>',
-                        unsafe_allow_html=True
-                    )
-
-
 # --- Display content based on menu selection ---
 if selected == "ראשי":
     st.title("ראשי")
     st.write("ברוכים הבאים לעמוד הראשי.")
 elif selected == "רשימת מורים":
+    teacherList.teacherList()
 
-    data = sendRequest("getTeacherList", None, "get")
-
-    column_names = ['ID', 'שם המורה', 'מספר טלפון', 'מקצוע', 'צבע']
-    df = pd.DataFrame(data["teachers_list"], columns=column_names)
-    st.session_state.teachers_df = df
-
-
-    # --- Styling the DataFrame ---
-    # A function that takes a single cell value and returns a CSS style string
-    def color_cell(val):
-        return f'background-color: {val}'
-
-    # Apply the style to the 'צבע' column
-    styled_df = st.session_state.teachers_df.style.applymap(color_cell, subset=['צבע'])
-
-    # Use columns to center the dataframe
-    col1, col2, col3 = st.columns([1, 4, 1])
-
-    with col2:
-        # Display the styled DataFrame
-        st.dataframe(styled_df, use_container_width=True)
-
-    # --- The rest of your code for forms ---
-    st.write("---")
-    # You can also use columns for the forms to align them
-    col_form1, col_form2, col_form3  = st.columns([1, 4, 1])
-    with col_form2:
-        st.write("### הוספת מורה חדש")
-        with st.form("add_teacher_form"):
-            teacher_name = st.text_input("שם המורה")
-            teacher_phone = st.text_input("מספר טלפון")
-            teacher_subject = st.text_input("מקצוע")
-            teacher_color = st.color_picker("בחר צבע למורה", "#FF4B4B")
-            submitted = st.form_submit_button("הוסף מורה")
-
-            if submitted:
-                if teacher_name and teacher_phone and teacher_subject:
-                    payload = {
-                        'name': teacher_name,
-                        'phone': teacher_phone,
-                        'profession': teacher_subject,
-                        'color': teacher_color
-                    }
-                    data = sendRequest("setNewTeacher", payload, "post")
-                    st.success(f"המורה {teacher_name} נוסף בהצלחה!")
-                    st.rerun()
-                else:
-                    st.error("יש למלא את כל השדות כדי להוסיף מורה.")
-
-    # --- מחיקת מורה ---
-    st.write("---")
-    # השתמש בעמודות כדי למרכז את הטופס
-    col_del1, col_del2, col_del3 = st.columns([1, 4, 1])
-
-    with col_del2:
-        st.write("### מחיקת מורה")
-        if not st.session_state.teachers_df.empty:
-            teachers_list = st.session_state.teachers_df['שם המורה'].tolist()
-            teacher_to_delete = st.selectbox("בחר מורה למחיקה", teachers_list)
-
-            if st.button("מחק מורה"):
-                st.session_state.teachers_df = st.session_state.teachers_df[
-                    st.session_state.teachers_df['שם המורה'] != teacher_to_delete]
-                st.success(f"המורה {teacher_to_delete} נמחק בהצלחה!")
-                st.rerun()
-        else:
-            st.write("אין מורים למחיקה.")
     pass
 elif selected == "רשימת חדרים":
+    rooms.roomsList()
 
-    col_form1, col_form2, col_form3  = st.columns([1, 4, 1])
-    with col_form2:
-
-        data = sendRequest("getRoomsList", None, "get")
-        df_rooms = pd.DataFrame(data['roomsList'])
-        df_rooms.columns = ['מספר חדר', 'יעוד']
-        st.dataframe(df_rooms, use_container_width=True)
 elif selected == "רשימת בתי ספר":
-    col_form1, col_form2, col_form3  = st.columns([1, 4, 1])
-    with col_form2:
-        data = sendRequest("getSchoolsList", None, "get")
-        df_school = pd.DataFrame(data['schoolsList'])
-        df_school.columns = ['שם בית ספר', 'מספר טלפון', 'כתובת']
-        st.dataframe(df_school, use_container_width=True)
-        st.write("---")
-        st.write("### הוספת בית ספר")
-    col_form1, col_form2, col_form3 = st.columns([1, 4, 1])
-    with col_form2:
-        with st.form("add_teacher_form"):
-            teacher_name = st.text_input("שם בית ספר")
-            teacher_phone = st.text_input("מספר טלפון")
-            teacher_subject = st.text_input("כתובת")
-            submitted = st.form_submit_button("הוסף בית ספר")
-
-            if submitted:
-                # בדיקה שכל השדות הוזנו
-                if teacher_name and teacher_phone and teacher_subject:
-                    new_teacher = pd.DataFrame([{
-                        'שם בית ספר': teacher_name,
-                        'מספר טלפון': teacher_phone,
-                        'כתובת': teacher_subject
-                    }])
-                    st.session_state.teachers_df = pd.concat([st.session_state.teachers_df, new_teacher], ignore_index=True)
-                    st.success(f"בית ספר {teacher_name} נוסף בהצלחה!")
-                    st.rerun()
-                else:
-                    st.error("יש למלא את כל השדות כדי להוסיף בית ספר.")
+    schools.schoolsList()
 elif selected == "מערכת שעות":
     # Nested horizontal menu for the "מערכת שעות" page
     sub_selected = option_menu(
@@ -425,76 +272,4 @@ elif selected == "מערכת שעות":
     elif sub_selected == "לבית ספר":
         st.write("כאן תוצג מערכת שעות עבור בית הספר כולו.")
 elif selected == "לוח מבחנים":
-    st.set_page_config(layout="wide")
-
-    # Initialize session state for the current date and notes
-    if 'current_date' not in st.session_state:
-        st.session_state.current_date = date.today()
-    if 'notes' not in st.session_state:
-        st.session_state.notes = {}
-
-    # Navigation buttons
-    col1, col2, col3 = st.columns([1, 1, 1])
-
-    with col1:
-        if st.button("⬅️ חודש קודם"):
-            current_date = st.session_state.current_date
-            if current_date.month == 1:
-                st.session_state.current_date = date(current_date.year - 1, 12, 1)
-            else:
-                st.session_state.current_date = date(current_date.year, current_date.month - 1, 1)
-            st.rerun()
-
-    with col2:
-        st.markdown(
-            "<div style='text-align: center; font-size: 24px; font-weight: bold;'> "
-            f"{st.session_state.current_date.strftime('%B %Y')}"
-            "</div>",
-            unsafe_allow_html=True
-        )
-
-    with col3:
-        if st.button("חודש הבא ➡️"):
-            current_date = st.session_state.current_date
-            if current_date.month == 12:
-                st.session_state.current_date = date(current_date.year + 1, 1, 1)
-            else:
-                st.session_state.current_date = date(current_date.year, current_date.month + 1, 1)
-            st.rerun()
-
-    display_calendar_month(st.session_state.current_date.year, st.session_state.current_date.month)
-
-    st.markdown("---")
-
-    # Text input and buttons for adding/deleting notes
-    st.subheader("הוסף/מחק טקסט מהיומן")
-
-    days_in_month = calendar.monthrange(st.session_state.current_date.year, st.session_state.current_date.month)[1]
-    days_list = [d for d in range(1, days_in_month + 1)]
-
-    selected_day = st.selectbox("בחר יום:", days_list)
-    note_text = st.text_input("הכנס טקסט:", "")
-
-    col4, col5 = st.columns([1, 1])
-
-    with col4:
-        if st.button("הכנס טקסט"):
-            if note_text:
-                full_date = date(st.session_state.current_date.year, st.session_state.current_date.month, selected_day)
-                st.session_state.notes[full_date] = note_text
-                st.success(f"הטקסט הוכנס ליום {selected_day} בהצלחה!")
-                st.rerun()
-            else:
-                st.warning("נא להזין טקסט")
-
-    with col5:
-        if st.button("מחק טקסט"):
-            full_date = date(st.session_state.current_date.year, st.session_state.current_date.month, selected_day)
-            if full_date in st.session_state.notes:
-                del st.session_state.notes[full_date]
-                st.success(f"הטקסט נמחק מיום {selected_day} בהצלחה!")
-                st.rerun()
-            else:
-                st.warning("אין טקסט למחוק ביום זה")
-
-    st.markdown("---")
+    testsBoard.testsBoard()

@@ -1,6 +1,0 @@
-
-
-def teacherList():
-
-
-    pass
