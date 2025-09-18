@@ -1,6 +1,8 @@
 import streamlit as st
 from datetime import date
 import calendar
+from streamlit_option_menu import option_menu
+
 
 def display_calendar_month(year, month):
     """
@@ -9,7 +11,7 @@ def display_calendar_month(year, month):
     # Use Hebrew day names in the correct order (Sunday to Saturday)
     hebrew_day_names = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"]
 
-    st.markdown(f"## {calendar.month_name[month]} {year}")
+    #st.markdown(f"## {calendar.month_name[month]} {year}")
 
     # Create columns for the day names
     cols = st.columns(7)
@@ -58,7 +60,8 @@ def display_calendar_month(year, month):
                         unsafe_allow_html=True
                     )
 
-def testsBoard():
+
+def monthTestBoard():
     st.set_page_config(layout="wide")
 
     # Initialize session state for the current date and notes
@@ -132,4 +135,26 @@ def testsBoard():
                 st.warning("אין טקסט למחוק ביום זה")
 
     st.markdown("---")
+
+    pass
+
+
+def testsBoard():
+
+    sub_selected = option_menu(
+        menu_title=None,
+        options=["חודשי", "שבועי", "רשימה"],
+        icons=["calendar", "calendar-check", "person"],
+        menu_icon=None,
+        default_index=0,
+        orientation="horizontal",
+    )
+
+    if sub_selected == "חודשי":
+        monthTestBoard()
+    elif sub_selected == "שבועי":
+        st.write("כאן תוצג מערכת מבחנים שבועית.")
+    elif sub_selected == "רשימה":
+        st.write("כאן תוצג רשימת מבחנים.")
+
 
