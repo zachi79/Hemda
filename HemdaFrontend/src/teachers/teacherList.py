@@ -1,5 +1,5 @@
 import streamlit as st
-from sendRequest import sendRequest
+from src.common.sendRequest import sendRequest
 import pandas as pd
 
 

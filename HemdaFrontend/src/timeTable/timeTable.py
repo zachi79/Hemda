@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from sendRequest import sendRequest
+from src.common.sendRequest import sendRequest
 import pandas as pd
 
 

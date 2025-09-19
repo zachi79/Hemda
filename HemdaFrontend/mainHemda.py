@@ -1,18 +1,12 @@
 # mainHemda.py
-import pandas
-import streamlit as st
-from streamlit_option_menu import option_menu
-import pandas as pd
-import calendar
-from datetime import date
 
+import streamlit as st
 import mainPage
-import rooms
-import schools
-import teacherList
-import testsBoard
-import timeTable
-from sendRequest import sendRequest
+from src.rooms import rooms
+from src.schools import schools
+from src.teachers import teacherList
+from src.testsBoard import testsBoard
+from src.timeTable import timeTable
 import components
 
 
