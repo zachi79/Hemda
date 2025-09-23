@@ -17,7 +17,7 @@ def staticTimeTable():
     room_numbers = [room[0] for room in rooms_data['roomsList']]
 
     teachers_data = sendRequest("getTeacherList", None, "get")
-    columns = ['id', 'teachername', 'phone', 'prof', 'color']
+    columns = ['id', 'teachername', 'phone', 'prof','email', 'color']
     teachers_dataDF = pd.DataFrame(teachers_data['teachers_list'], columns=columns)
 
     # Define grades and subjects

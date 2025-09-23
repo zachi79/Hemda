@@ -1,5 +1,5 @@
 from dbmain import *
-
+import pandas
 
 def getTeacherListFromDB(conn):
     query = "SELECT * FROM public.teachers ORDER BY user_id ASC"
@@ -67,3 +67,18 @@ def delFixedTimeTableDB(conn, data):
     """
     data = sendSetData(conn, query, data_to_del)
     return data
+
+
+def getTestsBoardDB(conn):
+    query = "SELECT * FROM public.testsboard"
+    data = sendGetData(conn, query)
+    return data
+
+def delTestsBoardDB(conn):
+    query = "TRUNCATE TABLE public.testsboard"
+    data = sendGetData(conn, query)
+    return data
+
+def setTestsBoardDB(conn, dfData):
+    dfData.to_sql(name='public.testsboard', con=conn, if_exists='append', index=False)
+    return None

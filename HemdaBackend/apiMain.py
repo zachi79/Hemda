@@ -125,3 +125,24 @@ def delFixedTimeTable(data: TimeTableData):
     }
     payload = json.dumps(payload)
     return payload
+
+
+
+@app.get("/getTestsBoard")
+def getTestsBoard():
+    testsBoard = mainServer.getTestsBoard()
+    payload = {
+        "testsBoard": testsBoard
+    }
+    payload = json.dumps(payload)
+    return payload
+
+
+@app.post("/setTestsBoard")
+def setTestsBoard(data):
+    testsBoard = 0
+    payload = {
+        "testsBoard": testsBoard
+    }
+    payload = json.dumps(payload)
+    return payload

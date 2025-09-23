@@ -4,6 +4,7 @@ import calendar
 from streamlit_option_menu import option_menu
 import pandas as pd
 
+from src.common.sendRequest import sendRequest
 
 
 def display_calendar_month(year, month):
@@ -145,7 +146,8 @@ def testsBoard():
 
     sub_selected = option_menu(
         menu_title=None,
-        options=["רשימה", "רשימה2", "חודשי"],
+        #options=["רשימה", "רשימה2", "חודשי"],
+        options=["רשימה"],
         icons=["person", "calendar-check", "calendar"],
         menu_icon=None,
         default_index=0,
@@ -155,11 +157,16 @@ def testsBoard():
     if sub_selected == "חודשי":
         monthTestBoard()
     elif sub_selected == "רשימה":
-        # הגדרת אפשרויות קבועות לשימוש בעמודות בחירה
-        SCHOOLS = ['תיכון א', 'תיכון ב', 'תיכון ג', 'תיכון ד']
+        schools_data = sendRequest("getSchoolsList", None, "get")
+        SCHOOLS = [school[0] for school in schools_data['schoolsList']]
+
+        rooms_data = sendRequest("getRoomsList", None, "get")
+        ROOMS = [room[0] for room in rooms_data['roomsList']]
+
         GRADES = ['י1', 'י2', 'י3', 'יא1', 'יא2', 'יא3', 'יב1', 'יב2', 'יב3']
         SUBJECTS = ['כימיה', 'פיסיקה']
         TEACHERS = ['מורה א', 'מורה ב', 'מורה ג', 'מורה ד']
+
 
         # --- הגדרת מבנה הטבלה ההתחלתית ---
         # יצירת DataFrame ראשוני עם עמודות ריקות/ברירת מחדל
@@ -167,12 +174,17 @@ def testsBoard():
         data = {
             'בית ספר': [SCHOOLS[0]],
             'שכבה': [GRADES[0]],
+            'מורה': [TEACHERS[0]],
             'מקצוע': [SUBJECTS[0]],  # בחירת מקצועות: נתחיל עם אחד
+            'חדר': [ROOMS[0]],
             'מבחן 1': [date.today()],
             'מבחן 2': [date.today()],
+            'מבחן 3': [date.today()],
+            'מבחן 4': [date.today()],
+            'מבחן 5': [date.today()],
+            'מבחן 6': [date.today()],
             'מבחן מתכונת': [date.today()],
             'בגרות מעבדה': [date.today()],
-            'מורה': [TEACHERS[0]],
             'סימון שליחה במייל': [False]
         }
 
@@ -190,7 +202,7 @@ def testsBoard():
                 'בית ספר': st.column_config.SelectboxColumn(
                     'בית ספר',
                     help='בחר את שם בית הספר',
-                    width='medium',
+                    width='small',
                     options=SCHOOLS,
                     required=True,
                 ),
@@ -201,11 +213,25 @@ def testsBoard():
                     options=GRADES,
                     required=True,
                 ),
+                'מורה': st.column_config.SelectboxColumn(
+                    'מורה',
+                    help='בחר את שם המורה',
+                    width='medium',
+                    options=TEACHERS,
+                    required=True,
+                ),
                 'מקצוע': st.column_config.SelectboxColumn(
                     'מקצוע',  # למרות הבקשה לכימיה/פיסיקה בלבד, ב-data_editor רגיל קשה לייצר Multiselect
                     help='בחר את המקצוע: כימיה או פיסיקה',
                     options=SUBJECTS,
                     required=True
+                ),
+                'חדר': st.column_config.SelectboxColumn(
+                    'חדר',
+                    help='בחר חדר',
+                    width='small',
+                    options=ROOMS,
+                    required=True,
                 ),
                 'מבחן 1': st.column_config.DateColumn(
                     'מבחן 1',
@@ -215,6 +241,30 @@ def testsBoard():
                 ),
                 'מבחן 2': st.column_config.DateColumn(
                     'מבחן 2',
+                    help='תאריך המבחן השני (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'מבחן 3': st.column_config.DateColumn(
+                    'מבחן 3',
+                    help='תאריך המבחן השני (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'מבחן 4': st.column_config.DateColumn(
+                    'מבחן 4',
+                    help='תאריך המבחן השני (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'מבחן 5': st.column_config.DateColumn(
+                    'מבחן 5',
+                    help='תאריך המבחן השני (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'מבחן 6': st.column_config.DateColumn(
+                    'מבחן 6',
                     help='תאריך המבחן השני (POPUP)',
                     format="YYYY-MM-DD",
                     min_value=date.today()
@@ -231,16 +281,10 @@ def testsBoard():
                     format="YYYY-MM-DD",
                     min_value=date.today()
                 ),
-                'מורה': st.column_config.SelectboxColumn(
-                    'מורה',
-                    help='בחר את שם המורה',
-                    width='medium',
-                    options=TEACHERS,
-                    required=True,
-                ),
                 'סימון שליחה במייל': st.column_config.CheckboxColumn(
                     'סימון שליחה במייל',
                     help='סמן לאחר שליחת המייל',
+                    width='small',
                     default=False
                 )
             },

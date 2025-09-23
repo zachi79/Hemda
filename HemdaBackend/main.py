@@ -14,6 +14,7 @@ class MainServerClass(MainInit):
         self.schoolsListDB = None
         self.roomsListDB = None
         self.fixedTimeTableDB = []
+        self.testsBoardDB = []
 
     def __enter__(self):
         return self
@@ -95,6 +96,18 @@ class MainServerClass(MainInit):
             )
             self.fixedTimeTableDB.remove(data_to_remove)
         return self.fixedTimeTableDB
+
+    def getTestsBoard(self):
+        if self.testsBoardDB == None:
+            self.testsBoardDB = getTestsBoardDB(self.conn)
+        return self.testsBoardDB
+
+    def delTestsBoard(self):
+        return self.testsBoardDB
+
+    def setTestsBoard(self):
+        return self.testsBoardDB
+
 
 # Create a global instance of the server.
 global mainServer

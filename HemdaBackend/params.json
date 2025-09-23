@@ -2,6 +2,7 @@
   "system": {
     "postgresql": {
         "dbname":"hemda",
+        "scheme": "public",
         "user":"postgres",
         "password":"admin",
         "host":"localhost",

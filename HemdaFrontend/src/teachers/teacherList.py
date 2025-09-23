@@ -6,7 +6,7 @@ import pandas as pd
 def teacherList():
     data = sendRequest("getTeacherList", None, "get")
 
-    column_names = ['ID', 'שם המורה', 'מספר טלפון', 'מקצוע', 'צבע']
+    column_names = ['ID', 'שם המורה', 'מספר טלפון', 'מקצוע','Email', 'צבע']
     df = pd.DataFrame(data["teachers_list"], columns=column_names)
     st.session_state.teachers_df = df
 
@@ -35,6 +35,7 @@ def teacherList():
             teacher_name = st.text_input("שם המורה")
             teacher_phone = st.text_input("מספר טלפון")
             teacher_subject = st.text_input("מקצוע")
+            teacher_email = st.text_input("Email")
             teacher_color = st.color_picker("בחר צבע למורה", "#FF4B4B")
             submitted = st.form_submit_button("הוסף מורה")
 
@@ -44,6 +45,7 @@ def teacherList():
                         'name': teacher_name,
                         'phone': teacher_phone,
                         'profession': teacher_subject,
+                        'email': teacher_email,
                         'color': teacher_color
                     }
                     data = sendRequest("setNewTeacher", payload, "post")
