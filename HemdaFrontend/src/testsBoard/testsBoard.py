@@ -401,6 +401,7 @@ def testsBoard():
 
     elif sub_selected == "רשימה":
 
+        data = sendRequest("getTestsBoard", None, "get")
         schools_data = sendRequest("getSchoolsList", None, "get")
         SCHOOLS = [school[0] for school in schools_data['schoolsList']]
 
@@ -415,34 +416,45 @@ def testsBoard():
         teachers_dataDF = pd.DataFrame(teachers_data['teachers_list'], columns=columns)
         TEACHERS =  teachers_dataDF['teachername'].tolist()# ['מורה א', 'מורה ב', 'מורה ג', 'מורה ד']
 
-        data = {
-            'בית ספר': [SCHOOLS[0]],
-            'שכבה': [GRADES[0]],
-            'מורה': [TEACHERS[0]],
-            'מקצוע': [SUBJECTS[0]],  # בחירת מקצועות: נתחיל עם אחד
-            'חדר': [ROOMS[0]],
-            'מבחן 1': [date.today()],
-            'מבחן 2': [date.today()],
-            'מבחן 3': [date.today()],
-            'מבחן 4': [date.today()],
-            'מבחן 5': [date.today()],
-            'מבחן 6': [date.today()],
-            'מבחן מתכונת': [date.today()],
-            'בגרות מעבדה': [date.today()],
-            'סימון שליחה במייל': [False]
-        }
+        # data = {
+        #     'בית ספר': [SCHOOLS[0]],
+        #     'שכבה': [GRADES[0]],
+        #     'מורה': [TEACHERS[0]],
+        #     'מקצוע': [SUBJECTS[0]],  # בחירת מקצועות: נתחיל עם אחד
+        #     'חדר': [ROOMS[0]],
+        #     'מבחן 1': [date.today()],
+        #     'מבחן 2': [date.today()],
+        #     'מבחן 3': [date.today()],
+        #     'מבחן 4': [date.today()],
+        #     'מבחן 5': [date.today()],
+        #     'מבחן 6': [date.today()],
+        #     'מבחן מתכונת': [date.today()],
+        #     'בגרות מעבדה': [date.today()],
+        #     'סימון שליחה במייל': [False]
+        # }
+        table_columns = ['בית ספר',
+            'שכבה',
+            'מורה',
+            'מקצוע',
+            'חדר',
+            'מבחן 1',
+            'מבחן 2',
+            'מבחן 3',
+            'מבחן 4',
+            'מבחן 5',
+            'מבחן 6',
+            'מבחן מתכונת',
+            'בגרות מעבדה',
+            'סימון שליחה במייל'
+        ]
+        if data['testsBoard']:
+            df = pd.DataFrame(data)
+        else:
+            df = pd.DataFrame(columns=table_columns)
 
-        df = pd.DataFrame(data)
-
-        # with col_form3:
-        #     st.button('Apply')
         col_form1, col_form2, col_form3= st.columns([1, 2, 1])
         with col_form2:
             st.title('📝 טבלת תכנון בחינות - עריכה ושמירה')
-            button_col1, button_col2, button_col3 = st.columns([2, 1, 2])
-            with button_col2:
-                st.button("Apply")
-
 
         st.caption('ניתן לערוך כל שורה ולהוסיף שורות חדשות.')
 
@@ -540,16 +552,45 @@ def testsBoard():
                     default=False
                 )
             },
-            use_container_width=True
+            #use_container_width=True
+            width = 'stretch'
         )
-        # teacherSelected = edited_df.iloc[-1]["מורה"]
-        # subjectSelected = teachers_dataDF.loc[teachers_dataDF['teachername'] == teacherSelected, 'prof'].iloc[0]
-        # edited_df.iloc[-1]["מקצוע"] = subjectSelected
 
-        # # --- הצגת הנתונים שנערכו (אופציונלי) ---
-        # st.divider()
-        # st.subheader('נתונים שנשמרו לאחר עריכה:')
-        # st.dataframe(edited_df, use_container_width=True)
+        button_css = """
+            <style>
+            div.stButton > button:first-child {
+                background-color: #4CAF50; /* Green background */
+                color: white;
+                font-size: 20px;
+                font-weight: bold;
+                border-radius: 12px;
+                border: 2px solid black;
+                padding: 10px 24px;
+                cursor: pointer;
+                /* Add a smooth transition for the color change */
+                transition: background-color 0.3s ease;
+            }
+
+            /* Change color to yellow on hover */
+            div.stButton > button:hover {
+                background-color: #FFC107; /* Gold/yellow color */
+            }
+
+            /* Change color to a darker yellow when the button is actively being pressed */
+            div.stButton > button:active {
+                background-color: #FF12FF; 
+            }
+            </style>
+        """
+
+        st.markdown(button_css, unsafe_allow_html=True)
+
+        # Create the button with the custom style
+        if st.button("Apply"):
+            print("send testsBoard Data")
+            payload = edited_df
+            data = sendRequest("setTestsBoard", payload, "post")
+
     elif sub_selected == "רשימה2":
         st.write("כאן תוצג רשימת מבחנים.")
 
