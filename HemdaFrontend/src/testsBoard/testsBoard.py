@@ -148,7 +148,8 @@ def testsBoard():
         menu_title=None,
         #options=["רשימה", "רשימה2", "חודשי"],
         options=["רשימה"],
-        icons=["person", "calendar-check", "calendar"],
+        #icons=["person", "calendar-check", "calendar"],
+        icons=["calendar"],
         menu_icon=None,
         default_index=0,
         orientation="horizontal",
@@ -156,7 +157,8 @@ def testsBoard():
 
     if sub_selected == "חודשי":
         monthTestBoard()
-    elif sub_selected == "רשימה":
+
+    elif sub_selected == "רשימה22":
         schools_data = sendRequest("getSchoolsList", None, "get")
         SCHOOLS = [school[0] for school in schools_data['schoolsList']]
 
@@ -164,9 +166,15 @@ def testsBoard():
         ROOMS = [room[0] for room in rooms_data['roomsList']]
 
         GRADES = ['י1', 'י2', 'י3', 'יא1', 'יא2', 'יא3', 'יב1', 'יב2', 'יב3']
-        SUBJECTS = ['כימיה', 'פיסיקה']
-        TEACHERS = ['מורה א', 'מורה ב', 'מורה ג', 'מורה ד']
+        SUBJECTS = ['כימיה', 'פיסיקה','']
 
+        teachers_data = sendRequest("getTeacherList", None, "get")
+        columns = ['id', 'teachername', 'phone', 'prof', 'email', 'color']
+        teachers_dataDF = pd.DataFrame(teachers_data['teachers_list'], columns=columns)
+        TEACHERS =  teachers_dataDF['teachername'].tolist()# ['מורה א', 'מורה ב', 'מורה ג', 'מורה ד']
+
+        #TEACHERS = ['מורה א', 'מורה ב', 'מורה ג', 'מורה ד']
+        #SUBJECTS = ['כימיה', 'פיסיקה', 'כימיה','פיסיקה']
 
         # --- הגדרת מבנה הטבלה ההתחלתית ---
         # יצירת DataFrame ראשוני עם עמודות ריקות/ברירת מחדל
@@ -290,11 +298,258 @@ def testsBoard():
             },
             use_container_width=True
         )
+        teacherSelected = edited_df.iloc[-1]["מורה"]
+        subjectSelected = teachers_dataDF.loc[teachers_dataDF['teachername'] == teacherSelected, 'prof'].iloc[0]
+        edited_df.iloc[-1]["מקצוע"] = subjectSelected
+    elif sub_selected == "רשימה11":
+        schools_data = sendRequest("getSchoolsList", None, "get")
+        SCHOOLS = [school[0] for school in schools_data['schoolsList']]
 
-        # --- הצגת הנתונים שנערכו (אופציונלי) ---
-        st.divider()
-        st.subheader('נתונים שנשמרו לאחר עריכה:')
-        st.dataframe(edited_df, use_container_width=True)
+        rooms_data = sendRequest("getRoomsList", None, "get")
+        ROOMS = [room[0] for room in rooms_data['roomsList']]
+
+        GRADES = ['י1', 'י2', 'י3', 'יא1', 'יא2', 'יא3', 'יב1', 'יב2', 'יב3']
+        SUBJECTS = ['כימיה', 'פיסיקה','']
+
+        teachers_data = sendRequest("getTeacherList", None, "get")
+        columns = ['id', 'teachername', 'phone', 'prof', 'email', 'color']
+        teachers_dataDF = pd.DataFrame(teachers_data['teachers_list'], columns=columns)
+        TEACHERS =  teachers_dataDF['teachername'].tolist()# ['מורה א', 'מורה ב', 'מורה ג', 'מורה ד']
+
+        #TEACHERS = ['מורה א', 'מורה ב', 'מורה ג', 'מורה ד']
+        #SUBJECTS = ['כימיה', 'פיסיקה', 'כימיה','פיסיקה']
+
+        # --- הגדרת מבנה הטבלה ההתחלתית ---
+        # יצירת DataFrame ראשוני עם עמודות ריקות/ברירת מחדל
+        # ניתן להוסיף שורות דוגמה אם רוצים
+        if 'df' not in st.session_state:
+            data = {
+                'בית ספר': [SCHOOLS[0]],
+                'שכבה': [GRADES[0]],
+                'מורה': [TEACHERS[0]],
+                'מקצוע': [SUBJECTS[0]],
+                'חדר': [ROOMS[0]],
+                'מבחן 1': [date.today()],
+                'מבחן 2': [date.today()],
+                'מבחן 3': [date.today()],
+                'מבחן 4': [date.today()],
+                'מבחן 5': [date.today()],
+                'מבחן 6': [date.today()],
+                'מבחן מתכונת': [date.today()],
+                'בגרות מעבדה': [date.today()],
+                'סימון שליחה במייל': [False]
+            }
+            st.session_state.df = pd.DataFrame(data)
+
+        # --- Callback function to handle changes ---
+        def update_subject():
+            edited_rows = st.session_state["data_editor"]["edited_rows"]
+            added_rows = st.session_state["data_editor"]["added_rows"]
+
+            # Check for changes in existing rows
+            for index, changes in edited_rows.items():
+                if "מורה" in changes:
+                    teacherSelected = changes["מורה"]
+                    # Find the corresponding subject in your original data
+                    subjectSelected = \
+                    teachers_dataDF.loc[teachers_dataDF['teachername'] == teacherSelected, 'prof'].iloc[0]
+                    st.session_state.df.loc[index, "מקצוע"] = subjectSelected
+
+            # Check for newly added rows
+            for new_row in added_rows:
+                if "מורה" in new_row:
+                    teacherSelected = new_row["מורה"]
+                    subjectSelected = \
+                    teachers_dataDF.loc[teachers_dataDF['teachername'] == teacherSelected, 'prof'].iloc[0]
+                    st.session_state.df.iloc[-1]["מקצוע"] = subjectSelected
+
+        #df = pd.DataFrame(data)
+
+        # --- כותרת ופקדים ---
+        st.title('📝 טבלת תכנון בחינות - עריכה ושמירה')
+        st.caption('ניתן לערוך כל שורה ולהוסיף שורות חדשות.')
+
+        # --- פונקציה לעריכת ה-DataFrame באמצעות st.data_editor ---
+        edited_df = st.data_editor(
+            st.session_state.df,
+            num_rows="dynamic",
+            key="data_editor",
+            on_change=update_subject,  # Pass the callback function here
+            column_config={
+                'בית ספר': st.column_config.SelectboxColumn('בית ספר', options=SCHOOLS, required=True),
+                'שכבה': st.column_config.SelectboxColumn('שכבה', options=GRADES, required=True),
+                'מורה': st.column_config.SelectboxColumn('מורה', options=TEACHERS, required=True),
+                'מקצוע': st.column_config.SelectboxColumn('מקצוע', options=SUBJECTS, required=True),
+                'חדר': st.column_config.SelectboxColumn('חדר', options=ROOMS, required=True),
+                'מבחן 1': st.column_config.DateColumn('מבחן 1', format="YYYY-MM-DD", min_value=date.today()),
+                'מבחן 2': st.column_config.DateColumn('מבחן 2', format="YYYY-MM-DD", min_value=date.today()),
+                'מבחן 3': st.column_config.DateColumn('מבחן 3', format="YYYY-MM-DD", min_value=date.today()),
+                'מבחן 4': st.column_config.DateColumn('מבחן 4', format="YYYY-MM-DD", min_value=date.today()),
+                'מבחן 5': st.column_config.DateColumn('מבחן 5', format="YYYY-MM-DD", min_value=date.today()),
+                'מבחן 6': st.column_config.DateColumn('מבחן 6', format="YYYY-MM-DD", min_value=date.today()),
+                'מבחן מתכונת': st.column_config.DateColumn('מבחן מתכונת', format="YYYY-MM-DD", min_value=date.today()),
+                'בגרות מעבדה': st.column_config.DateColumn('בגרות מעבדה', format="YYYY-MM-DD", min_value=date.today()),
+                'סימון שליחה במייל': st.column_config.CheckboxColumn('סימון שליחה במייל', default=False)
+            },
+            use_container_width=True
+        )
+
+        st.write(st.session_state.df)
+        # teacherSelected = edited_df.iloc[-1]["מורה"]
+        # subjectSelected = teachers_dataDF.loc[teachers_dataDF['teachername'] == teacherSelected, 'prof'].iloc[0]
+        # edited_df.iloc[-1]["מקצוע"] = subjectSelected
+
+    elif sub_selected == "רשימה":
+
+        schools_data = sendRequest("getSchoolsList", None, "get")
+        SCHOOLS = [school[0] for school in schools_data['schoolsList']]
+
+        rooms_data = sendRequest("getRoomsList", None, "get")
+        ROOMS = [room[0] for room in rooms_data['roomsList']]
+
+        GRADES = ['י1', 'י2', 'י3', 'יא1', 'יא2', 'יא3', 'יב1', 'יב2', 'יב3']
+        SUBJECTS = ['כימיה', 'פיסיקה','']
+
+        teachers_data = sendRequest("getTeacherList", None, "get")
+        columns = ['id', 'teachername', 'phone', 'prof', 'email', 'color']
+        teachers_dataDF = pd.DataFrame(teachers_data['teachers_list'], columns=columns)
+        TEACHERS =  teachers_dataDF['teachername'].tolist()# ['מורה א', 'מורה ב', 'מורה ג', 'מורה ד']
+
+        data = {
+            'בית ספר': [SCHOOLS[0]],
+            'שכבה': [GRADES[0]],
+            'מורה': [TEACHERS[0]],
+            'מקצוע': [SUBJECTS[0]],  # בחירת מקצועות: נתחיל עם אחד
+            'חדר': [ROOMS[0]],
+            'מבחן 1': [date.today()],
+            'מבחן 2': [date.today()],
+            'מבחן 3': [date.today()],
+            'מבחן 4': [date.today()],
+            'מבחן 5': [date.today()],
+            'מבחן 6': [date.today()],
+            'מבחן מתכונת': [date.today()],
+            'בגרות מעבדה': [date.today()],
+            'סימון שליחה במייל': [False]
+        }
+
+        df = pd.DataFrame(data)
+
+        # with col_form3:
+        #     st.button('Apply')
+        col_form1, col_form2, col_form3= st.columns([1, 2, 1])
+        with col_form2:
+            st.title('📝 טבלת תכנון בחינות - עריכה ושמירה')
+            button_col1, button_col2, button_col3 = st.columns([2, 1, 2])
+            with button_col2:
+                st.button("Apply")
+
+
+        st.caption('ניתן לערוך כל שורה ולהוסיף שורות חדשות.')
+
+        # --- פונקציה לעריכת ה-DataFrame באמצעות st.data_editor ---
+        edited_df = st.data_editor(
+            df,
+            num_rows="dynamic",  # מאפשר למשתמש להוסיף ולמחוק שורות
+            column_config={
+                'בית ספר': st.column_config.SelectboxColumn(
+                    'בית ספר',
+                    help='בחר את שם בית הספר',
+                    width='small',
+                    options=SCHOOLS,
+                    required=True,
+                ),
+                'שכבה': st.column_config.SelectboxColumn(
+                    'שכבה',
+                    help='בחר את שכבת הלימוד',
+                    width='small',
+                    options=GRADES,
+                    required=True,
+                ),
+                'מורה': st.column_config.SelectboxColumn(
+                    'מורה',
+                    help='בחר את שם המורה',
+                    width='medium',
+                    options=TEACHERS,
+                    required=True,
+                ),
+                'מקצוע': st.column_config.SelectboxColumn(
+                    'מקצוע',  # למרות הבקשה לכימיה/פיסיקה בלבד, ב-data_editor רגיל קשה לייצר Multiselect
+                    help='בחר את המקצוע: כימיה או פיסיקה',
+                    options=SUBJECTS,
+                    required=True
+                ),
+                'חדר': st.column_config.SelectboxColumn(
+                    'חדר',
+                    help='בחר חדר',
+                    width='small',
+                    options=ROOMS,
+                    required=True,
+                ),
+                'מבחן 1': st.column_config.DateColumn(
+                    'מבחן 1',
+                    help='תאריך המבחן הראשון (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'מבחן 2': st.column_config.DateColumn(
+                    'מבחן 2',
+                    help='תאריך המבחן השני (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'מבחן 3': st.column_config.DateColumn(
+                    'מבחן 3',
+                    help='תאריך המבחן השני (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'מבחן 4': st.column_config.DateColumn(
+                    'מבחן 4',
+                    help='תאריך המבחן השני (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'מבחן 5': st.column_config.DateColumn(
+                    'מבחן 5',
+                    help='תאריך המבחן השני (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'מבחן 6': st.column_config.DateColumn(
+                    'מבחן 6',
+                    help='תאריך המבחן השני (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'מבחן מתכונת': st.column_config.DateColumn(
+                    'מבחן מתכונת',
+                    help='תאריך מבחן המתכונת (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'בגרות מעבדה': st.column_config.DateColumn(
+                    'בגרות מעבדה',
+                    help='תאריך בחינת בגרות המעבדה (POPUP)',
+                    format="YYYY-MM-DD",
+                    min_value=date.today()
+                ),
+                'סימון שליחה במייל': st.column_config.CheckboxColumn(
+                    'סימון שליחה במייל',
+                    help='סמן לאחר שליחת המייל',
+                    width='small',
+                    default=False
+                )
+            },
+            use_container_width=True
+        )
+        # teacherSelected = edited_df.iloc[-1]["מורה"]
+        # subjectSelected = teachers_dataDF.loc[teachers_dataDF['teachername'] == teacherSelected, 'prof'].iloc[0]
+        # edited_df.iloc[-1]["מקצוע"] = subjectSelected
+
+        # # --- הצגת הנתונים שנערכו (אופציונלי) ---
+        # st.divider()
+        # st.subheader('נתונים שנשמרו לאחר עריכה:')
+        # st.dataframe(edited_df, use_container_width=True)
     elif sub_selected == "רשימה2":
         st.write("כאן תוצג רשימת מבחנים.")
 
