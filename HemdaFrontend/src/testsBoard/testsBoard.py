@@ -416,36 +416,20 @@ def testsBoard():
         teachers_dataDF = pd.DataFrame(teachers_data['teachers_list'], columns=columns)
         TEACHERS =  teachers_dataDF['teachername'].tolist()# ['מורה א', 'מורה ב', 'מורה ג', 'מורה ד']
 
-        # data = {
-        #     'בית ספר': [SCHOOLS[0]],
-        #     'שכבה': [GRADES[0]],
-        #     'מורה': [TEACHERS[0]],
-        #     'מקצוע': [SUBJECTS[0]],  # בחירת מקצועות: נתחיל עם אחד
-        #     'חדר': [ROOMS[0]],
-        #     'מבחן 1': [date.today()],
-        #     'מבחן 2': [date.today()],
-        #     'מבחן 3': [date.today()],
-        #     'מבחן 4': [date.today()],
-        #     'מבחן 5': [date.today()],
-        #     'מבחן 6': [date.today()],
-        #     'מבחן מתכונת': [date.today()],
-        #     'בגרות מעבדה': [date.today()],
-        #     'סימון שליחה במייל': [False]
-        # }
-        table_columns = ['בית ספר',
-            'שכבה',
-            'מורה',
-            'מקצוע',
-            'חדר',
-            'מבחן 1',
-            'מבחן 2',
-            'מבחן 3',
-            'מבחן 4',
-            'מבחן 5',
-            'מבחן 6',
-            'מבחן מתכונת',
-            'בגרות מעבדה',
-            'סימון שליחה במייל'
+        table_columns = ['schoolSelect',
+            'classSelect',
+            'teacherSelect',
+            'profSelect',
+            'roomSelect',
+            'test1',
+            'test2',
+            'test3',
+            'test4',
+            'test5',
+            'test6',
+            'matkonetTest',
+            'labTest',
+            'selectEmailSend'
         ]
         if data['testsBoard']:
             df = pd.DataFrame(data)
@@ -463,89 +447,83 @@ def testsBoard():
             df,
             num_rows="dynamic",  # מאפשר למשתמש להוסיף ולמחוק שורות
             column_config={
-                'בית ספר': st.column_config.SelectboxColumn(
-                    'בית ספר',
+                'schoolSelect': st.column_config.SelectboxColumn(
+                    'בית הספר',
                     help='בחר את שם בית הספר',
                     width='small',
                     options=SCHOOLS,
                     required=True,
                 ),
-                'שכבה': st.column_config.SelectboxColumn(
+                'classSelect': st.column_config.SelectboxColumn(
                     'שכבה',
                     help='בחר את שכבת הלימוד',
                     width='small',
                     options=GRADES,
                     required=True,
                 ),
-                'מורה': st.column_config.SelectboxColumn(
+                'teacherSelect': st.column_config.SelectboxColumn(
                     'מורה',
                     help='בחר את שם המורה',
                     width='medium',
                     options=TEACHERS,
                     required=True,
                 ),
-                'מקצוע': st.column_config.SelectboxColumn(
+                'profSelect': st.column_config.SelectboxColumn(
                     'מקצוע',  # למרות הבקשה לכימיה/פיסיקה בלבד, ב-data_editor רגיל קשה לייצר Multiselect
                     help='בחר את המקצוע: כימיה או פיסיקה',
                     options=SUBJECTS,
-                    required=True
                 ),
-                'חדר': st.column_config.SelectboxColumn(
+                'roomSelect': st.column_config.SelectboxColumn(
                     'חדר',
                     help='בחר חדר',
                     width='small',
                     options=ROOMS,
                     required=True,
                 ),
-                'מבחן 1': st.column_config.DateColumn(
+                'test1': st.column_config.DateColumn(
                     'מבחן 1',
                     help='תאריך המבחן הראשון (POPUP)',
                     format="YYYY-MM-DD",
                     min_value=date.today()
                 ),
-                'מבחן 2': st.column_config.DateColumn(
-                    'מבחן 2',
-                    help='תאריך המבחן השני (POPUP)',
-                    format="YYYY-MM-DD",
-                    min_value=date.today()
-                ),
-                'מבחן 3': st.column_config.DateColumn(
+                'test2': st.column_config.DateColumn('מבחן 2',help='תאריך המבחן השני (POPUP)',format="YYYY-MM-DD",min_value=date.today()),
+                'test3': st.column_config.DateColumn(
                     'מבחן 3',
                     help='תאריך המבחן השני (POPUP)',
                     format="YYYY-MM-DD",
                     min_value=date.today()
                 ),
-                'מבחן 4': st.column_config.DateColumn(
+                'test4': st.column_config.DateColumn(
                     'מבחן 4',
                     help='תאריך המבחן השני (POPUP)',
                     format="YYYY-MM-DD",
                     min_value=date.today()
                 ),
-                'מבחן 5': st.column_config.DateColumn(
+                'test5': st.column_config.DateColumn(
                     'מבחן 5',
                     help='תאריך המבחן השני (POPUP)',
                     format="YYYY-MM-DD",
                     min_value=date.today()
                 ),
-                'מבחן 6': st.column_config.DateColumn(
+                'test6': st.column_config.DateColumn(
                     'מבחן 6',
                     help='תאריך המבחן השני (POPUP)',
                     format="YYYY-MM-DD",
                     min_value=date.today()
                 ),
-                'מבחן מתכונת': st.column_config.DateColumn(
+                'matkonetTest': st.column_config.DateColumn(
                     'מבחן מתכונת',
                     help='תאריך מבחן המתכונת (POPUP)',
                     format="YYYY-MM-DD",
                     min_value=date.today()
                 ),
-                'בגרות מעבדה': st.column_config.DateColumn(
+                'labTest': st.column_config.DateColumn(
                     'בגרות מעבדה',
                     help='תאריך בחינת בגרות המעבדה (POPUP)',
                     format="YYYY-MM-DD",
                     min_value=date.today()
                 ),
-                'סימון שליחה במייל': st.column_config.CheckboxColumn(
+                'selectEmailSend': st.column_config.CheckboxColumn(
                     'סימון שליחה במייל',
                     help='סמן לאחר שליחת המייל',
                     width='small',
@@ -588,9 +566,9 @@ def testsBoard():
         # Create the button with the custom style
         if st.button("Apply"):
             print("send testsBoard Data")
-            payload = edited_df
+            payload = edited_df.to_json(orient='records')
             data = sendRequest("setTestsBoard", payload, "post")
-
+            st.rerun()
     elif sub_selected == "רשימה2":
         st.write("כאן תוצג רשימת מבחנים.")
 

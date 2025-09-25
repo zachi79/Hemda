@@ -98,14 +98,19 @@ class MainServerClass(MainInit):
         return self.fixedTimeTableDB
 
     def getTestsBoard(self):
-        if self.testsBoardDB == None:
+        if self.testsBoardDB == []:
             self.testsBoardDB = getTestsBoardDB(self.conn)
         return self.testsBoardDB
 
     def delTestsBoard(self):
+        self.testsBoardDB = []
         return self.testsBoardDB
 
-    def setTestsBoard(self):
+    def setTestsBoard(self, data):
+        self.delTestsBoard()
+        for item in data:
+            print(item)
+        self.testsBoardDB = data
         return self.testsBoardDB
 
 

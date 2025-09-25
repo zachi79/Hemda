@@ -1,4 +1,5 @@
 import time
+import pandas as pd
 
 import query
 import shared_data
@@ -25,7 +26,31 @@ def queueThread(conn, params):
             if item["cmd"] == "delFixedTimeTable":
                 query.delFixedTimeTableDB(conn, item["data"])
                 pass
+            if item["cmd"] == "setTestsBoard":
+                query.delTestsBoardDB(conn)
+                time.sleep(0.2)
+                data = pd.DataFrame(item["data"])
+                data = data.drop(columns=['selectEmailSend'])
+                data = data.rename(columns={
+                    'schoolSelect': 'schoolName',
+                    'classSelect': 'schoolClass',
+                    'teacherSelect': 'teacher_name',
+                    'profSelect': 'profession',
+                    'roomSelect': 'room_number',
+                    'test1': 'test1',
+                    'test2': 'test2',
+                    'test3': 'test3',
+                    'test4': 'test4',
+                    'test5': 'test5',
+                    'test6': 'test6',
+                    'matKonetTest': 'matKonetTest',
+                    'labTest': 'labTest'
+                })
 
+
+
+                query.setTestsBoardDB(conn, data)
+                pass
             shared_data.my_queue.task_done()
 
             pass

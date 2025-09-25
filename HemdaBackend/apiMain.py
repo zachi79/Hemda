@@ -1,11 +1,15 @@
 import json
 import datetime
+import typing
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
 
 from main import mainServer
 from shared_data import my_queue, results_queue
+
+from typing import List, Optional
+
 
 app = FastAPI()
 
@@ -138,8 +142,35 @@ def getTestsBoard():
     return payload
 
 
+class TestsBoardRow(BaseModel):
+    schoolSelect: str
+    classSelect: str
+    teacherSelect: str
+    profSelect: Optional[str] = None
+    roomSelect: str
+    test1: Optional[datetime.date] = None
+    test2: Optional[datetime.date] = None
+    test3: Optional[datetime.date] = None
+    test4: Optional[datetime.date] = None
+    test5: Optional[datetime.date] = None
+    test6: Optional[datetime.date] = None
+    matkonetTest: Optional[datetime.date] = None
+    labTest: Optional[datetime.date] = None
+    selectEmailSend: bool
+
 @app.post("/setTestsBoard")
-def setTestsBoard(data):
+async def setTestsBoard(request: Request ):
+    try:
+        data = await request.json()
+        data = json.loads(data)
+    except:
+        return 400
+    payloadToQ = {
+        "cmd": "setTestsBoard",
+        "data": data
+    }
+    my_queue.put(payloadToQ)
+
     testsBoard = 0
     payload = {
         "testsBoard": testsBoard
