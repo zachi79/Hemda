@@ -228,7 +228,7 @@ INSERT INTO public.testsboard(
 	schoolname, schoolclass, teacher_name, profession, room_number, test1, test2, test3, test4, test5, test6, matkonettest, labtest)
 	VALUES ('אליאנס',
 	'י1', 
-	'נטליה הולצמן',
+	'נטלי הולצמן',
 	'כימיה',
 	'107', 
 	'2025-11-27', 
