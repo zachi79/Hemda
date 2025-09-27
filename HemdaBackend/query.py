@@ -79,33 +79,38 @@ def getTestsBoardDB(conn):
 def delTestsBoardDB(conn):
     SCHEMA_NAME = 'public'
     TABLE_NAME = 'testsboard'
-    query = f"TRUNCATE TABLE {SCHEMA_NAME}.{TABLE_NAME}"
+    query = f"DELETE FROM {SCHEMA_NAME}.{TABLE_NAME}"
     data = sendGetData(conn, query)
     return data
 
-def setTestsBoardDB(conn, dfData):
+def setTestsBoardDB(conn, data):
     SCHEMA_NAME = 'public'
     TABLE_NAME = 'testsboard'
-    # --- 4. Prepare Data and Insert using execute_values (Efficient Batch Insert) ---
+    data_to_insert = (
+        data.schoolName,
+        data.schoolClass,
+        data.teacher_name,
+        data.profession,
+        data.room_number,
+        data.test1,
+        data.test2,
+        data.test3,
+        data.test4,
+        data.test5,
+        data.test6,
+        data.matKonetTest,
+        data.labTest,
 
-    # Get column names for the INSERT statement
-    columns = dfData.columns.tolist()
+    )
 
-    # Convert DataFrame to a list of tuples, matching the column order
-    # Note: pandas NaT (Not a Time) or None for date columns will be handled as NULL in SQL
-    data_to_insert = [tuple(row) for row in dfData.values]
-
-    # Construct the INSERT statement with dynamic column names
-    # %s is a placeholder for `psycopg2` values. (VALUES %s) is for execute_values
     query = f"""
-    INSERT INTO {SCHEMA_NAME}.{TABLE_NAME} ({', '.join(columns)})
-    VALUES %s
-    """
+            INSERT INTO {SCHEMA_NAME}.{TABLE_NAME} (
+                schoolName, schoolClass, teacher_name, profession, room_number, 
+                test1,test2,test3,test4,test5,test6,matKonetTest,labTest
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        """
+    sendSetData(conn, query, data_to_insert)
 
-    # Use execute_values for efficient batch insertion
-    # The 'data_to_insert' list of tuples will replace %s
-
-    #sendSetDFData(conn, query, data_to_insert)
-    print(f"\n{len(dfData)} rows inserted successfully using execute_values into {SCHEMA_NAME}.{TABLE_NAME}.")
 
     return None

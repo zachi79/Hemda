@@ -202,7 +202,40 @@ CREATE TABLE testsBoard (
 	Test4 Date,
 	Test5 Date,
 	Test6 Date,
-	MatKonet Date,
+	matkonetTest Date,
 	LabTest Date
 );
 
+
+CREATE TABLE testsBoard (
+	schoolName VARCHAR(255) NOT NULL,
+	schoolClass VARCHAR(255) NOT NULL,	
+	teacher_name VARCHAR(50) NOT NULL,
+    profession VARCHAR(50) NOT NULL,
+	room_number VARCHAR(10) NOT NULL,
+	Test1 VARCHAR(50),
+	Test2 VARCHAR(50),
+	Test3 VARCHAR(50),
+	Test4 VARCHAR(50),
+	Test5 VARCHAR(50),
+	Test6 VARCHAR(50),
+	matkonetTest VARCHAR(50),
+	LabTest VARCHAR(50)
+);
+
+
+INSERT INTO public.testsboard(
+	schoolname, schoolclass, teacher_name, profession, room_number, test1, test2, test3, test4, test5, test6, matkonettest, labtest)
+	VALUES ('אליאנס',
+	'י1', 
+	'נטליה הולצמן',
+	'כימיה',
+	'107', 
+	'2025-11-27', 
+	NULL, 
+	NULL, 
+	NULL, 
+	NULL, 
+	NULL, 
+	NULL, 
+	NULL);

@@ -4,6 +4,24 @@ import pandas as pd
 import query
 import shared_data
 
+
+table_columns = ['schoolSelect',
+                     'classSelect',
+                     'teacherSelect',
+                     'profSelect',
+                     'roomSelect',
+                     'test1',
+                     'test2',
+                     'test3',
+                     'test4',
+                     'test5',
+                     'test6',
+                     'matkonetTest',
+                     'labTest',
+                     'selectEmailSend'
+                     ]
+
+
 def queueThread(conn, params):
     """
     This function continuously checks the queue for new items.
@@ -28,8 +46,11 @@ def queueThread(conn, params):
                 pass
             if item["cmd"] == "setTestsBoard":
                 query.delTestsBoardDB(conn)
-                time.sleep(0.2)
+                time.sleep(0.1)
                 data = pd.DataFrame(item["data"])
+                df_emails_to_send = data[data['selectEmailSend']]
+                # for col in table_columns[5:13]:
+                #      dataDdataF[col] = pd.to_datetime(data[col])
                 data = data.drop(columns=['selectEmailSend'])
                 data = data.rename(columns={
                     'schoolSelect': 'schoolName',
@@ -48,8 +69,9 @@ def queueThread(conn, params):
                 })
 
 
+                for row in data:
 
-                query.setTestsBoardDB(conn, data)
+                    query.setTestsBoardDB(conn, data)
                 pass
             shared_data.my_queue.task_done()
 

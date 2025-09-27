@@ -1,6 +1,5 @@
 import json
 import datetime
-import typing
 
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
@@ -165,15 +164,17 @@ async def setTestsBoard(request: Request ):
         data = json.loads(data)
     except:
         return 400
-    payloadToQ = {
-        "cmd": "setTestsBoard",
-        "data": data
-    }
-    my_queue.put(payloadToQ)
-
-    testsBoard = 0
+    testsBoard, dataUpdated = mainServer.setTestsBoard(data)
     payload = {
         "testsBoard": testsBoard
     }
     payload = json.dumps(payload)
+
+    payloadToQ = {
+        "cmd": "setTestsBoard",
+        "data": dataUpdated
+    }
+    my_queue.put(payloadToQ)
+
+
     return payload

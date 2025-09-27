@@ -108,8 +108,6 @@ class MainServerClass(MainInit):
 
     def setTestsBoard(self, data):
         self.delTestsBoard()
-        for item in data:
-            print(item)
         self.testsBoardDB = data
         return self.testsBoardDB
 
