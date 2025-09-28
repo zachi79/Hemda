@@ -164,17 +164,11 @@ async def setTestsBoard(request: Request ):
         data = json.loads(data)
     except:
         return 400
-    testsBoard, dataUpdated = mainServer.setTestsBoard(data)
-    payload = {
-        "testsBoard": testsBoard
-    }
-    payload = json.dumps(payload)
+    testsBoard = mainServer.setTestsBoard(data)
 
     payloadToQ = {
         "cmd": "setTestsBoard",
-        "data": dataUpdated
+        "data": testsBoard
     }
     my_queue.put(payloadToQ)
-
-
-    return payload
+    return 200

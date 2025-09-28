@@ -1,5 +1,8 @@
 
 import threading
+
+import pandas as pd
+
 import apiMain
 import uvicorn
 from queueThread import queueThread
@@ -104,11 +107,17 @@ class MainServerClass(MainInit):
 
     def delTestsBoard(self):
         self.testsBoardDB = []
-        return self.testsBoardDB
+        pass
 
     def setTestsBoard(self, data):
         self.delTestsBoard()
-        self.testsBoardDB = data
+        teachersList = pd.DataFrame(getTeacherListFromDB(self.conn))
+        dataDF = pd.DataFrame(data)
+        for index, row in dataDF.iterrows():
+            row["profSelect"] = teachersList.loc[teachersList[1] == row[2], 3].iloc[0]
+            dataDF.loc[index] = row
+
+        self.testsBoardDB = dataDF
         return self.testsBoardDB
 
 

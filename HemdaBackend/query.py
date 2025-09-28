@@ -80,8 +80,8 @@ def delTestsBoardDB(conn):
     SCHEMA_NAME = 'public'
     TABLE_NAME = 'testsboard'
     query = f"DELETE FROM {SCHEMA_NAME}.{TABLE_NAME}"
-    data = sendGetData(conn, query)
-    return data
+    sendDelData(conn, query)
+    return None
 
 def setTestsBoardDB(conn, data):
     SCHEMA_NAME = 'public'

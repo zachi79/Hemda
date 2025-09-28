@@ -22,3 +22,16 @@ def sendSetData(conn, query, data):
     cursor.close()
     return
 
+
+def sendDelData(conn, query):
+    cur = conn.cursor()
+    try:
+        cur.execute(query)
+        conn.commit()
+        print("Query executed successfully.")
+    except psycopg2.ProgrammingError as e:
+        print(f"Error executing query: {e}")
+    finally:
+        cur.close()
+    return None
+

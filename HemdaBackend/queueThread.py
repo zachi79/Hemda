@@ -46,8 +46,7 @@ def queueThread(conn, params):
                 pass
             if item["cmd"] == "setTestsBoard":
                 query.delTestsBoardDB(conn)
-                time.sleep(0.1)
-                data = pd.DataFrame(item["data"])
+                data = item["data"]
                 df_emails_to_send = data[data['selectEmailSend']]
                 # for col in table_columns[5:13]:
                 #      dataDdataF[col] = pd.to_datetime(data[col])
@@ -68,10 +67,9 @@ def queueThread(conn, params):
                     'labTest': 'labTest'
                 })
 
-
+                datatuple = list(data.to_records(index=False))
                 for row in data:
-
-                    query.setTestsBoardDB(conn, data)
+                    query.setTestsBoardDB(conn, datatuple)
                 pass
             shared_data.my_queue.task_done()
 
