@@ -15,13 +15,15 @@ def sendRequest(url, payload, requestType):
         if requestType == "get":
             response = requests.get(url, params=payload)
         if requestType == "post":
-            response = requests.post(url, json=payload)
+            headers = {'Content-Type': 'application/json'}
+            response = requests.post(url, json=payload,headers=headers)
         # Raise an exception for bad status codes
         response.raise_for_status()
 
         print("GET request successful!")
         print("URL with query parameters:", response.url)
-        data = json.loads(response.json())
+        if requestType == "get":
+            data = json.loads(response.json())
 
 
     except requests.exceptions.RequestException as e:
