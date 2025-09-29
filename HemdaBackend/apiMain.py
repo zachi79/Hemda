@@ -147,14 +147,14 @@ class TestsBoardRow(BaseModel):
     teacherSelect: str
     profSelect: Optional[str] = None
     roomSelect: str
-    test1: Optional[datetime.date] = None
-    test2: Optional[datetime.date] = None
-    test3: Optional[datetime.date] = None
-    test4: Optional[datetime.date] = None
-    test5: Optional[datetime.date] = None
-    test6: Optional[datetime.date] = None
-    matkonetTest: Optional[datetime.date] = None
-    labTest: Optional[datetime.date] = None
+    test1: Optional[str] = None
+    test2: Optional[str] = None
+    test3: Optional[str] = None
+    test4: Optional[str] = None
+    test5: Optional[str] = None
+    test6: Optional[str] = None
+    matkonetTest: Optional[str] = None
+    labTest: Optional[str] = None
     selectEmailSend: bool
 
 @app.post("/setTestsBoard")
@@ -171,4 +171,4 @@ async def setTestsBoard(request: Request ):
         "data": testsBoard
     }
     my_queue.put(payloadToQ)
-    return 200
+    return {"message": "Tests board updated successfully."}

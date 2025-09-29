@@ -68,8 +68,8 @@ def queueThread(conn, params):
                 })
 
                 datatuple = list(data.to_records(index=False))
-                for row in data:
-                    query.setTestsBoardDB(conn, datatuple)
+                for row in datatuple:
+                    query.setTestsBoardDB(conn, row)
                 pass
             shared_data.my_queue.task_done()
 

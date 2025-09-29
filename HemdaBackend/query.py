@@ -86,22 +86,22 @@ def delTestsBoardDB(conn):
 def setTestsBoardDB(conn, data):
     SCHEMA_NAME = 'public'
     TABLE_NAME = 'testsboard'
-    data_to_insert = (
-        data.schoolName,
-        data.schoolClass,
-        data.teacher_name,
-        data.profession,
-        data.room_number,
-        data.test1,
-        data.test2,
-        data.test3,
-        data.test4,
-        data.test5,
-        data.test6,
-        data.matKonetTest,
-        data.labTest,
-
-    )
+    # data_to_insert = (
+    #     data.schoolName,
+    #     data.schoolClass,
+    #     data.teacher_name,
+    #     data.profession,
+    #     data.room_number,
+    #     data.test1,
+    #     data.test2,
+    #     data.test3,
+    #     data.test4,
+    #     data.test5,
+    #     data.test6,
+    #     data.matKonetTest,
+    #     data.labTest,
+    #
+    # )
 
     query = f"""
             INSERT INTO {SCHEMA_NAME}.{TABLE_NAME} (
@@ -110,7 +110,7 @@ def setTestsBoardDB(conn, data):
             )
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
-    sendSetData(conn, query, data_to_insert)
+    sendSetData(conn, query, data)
 
 
     return None

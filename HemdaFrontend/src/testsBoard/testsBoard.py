@@ -279,6 +279,8 @@ def testsBoard():
     # Create the button with the custom style
     if st.button("Apply"):
         print("send testsBoard Data")
+        # for col in ['test1','test2','test3','test4','test5','test6','matkonetTest','labTest']:
+        #     edited_df[col] = edited_df[col].astype(str)
         payload = edited_df.to_json(orient='records')
         data = sendRequest("setTestsBoard", payload, "post")
         st.rerun()
