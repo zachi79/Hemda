@@ -3,7 +3,7 @@ import pandas as pd
 
 import query
 import shared_data
-
+import sendEmail
 
 table_columns = ['schoolSelect',
                      'classSelect',
@@ -48,6 +48,7 @@ def queueThread(conn, params):
                 query.delTestsBoardDB(conn)
                 data = item["data"]
                 df_emails_to_send = data[data['selectEmailSend']]
+                sendEmail.sendEmailPrepareAndSend(df_emails_to_send)
                 # for col in table_columns[5:13]:
                 #      dataDdataF[col] = pd.to_datetime(data[col])
                 data = data.drop(columns=['selectEmailSend'])
